@@ -1,1 +1,4340 @@
-[{"id":"2641e2d8a125e03d","type":"tab","label":"SofarSolar","disabled":false,"info":""},{"id":"c5301cf5736b9aec","type":"tab","label":"Termostat","disabled":false,"info":"W tej zakładce będą przepływy dotyczące regulacji ogrzewania"},{"id":"f6c736a1387dd46d","type":"tab","label":"Krzywa grzewcza c.o.","disabled":false,"info":""},{"id":"4a573f048a4dd2d3","type":"tab","label":"Krzywa grzewcza podłogówki","disabled":false,"info":""},{"id":"b98894ba757de358","type":"tab","label":"Ograniczenie podłogowego","disabled":false,"info":""},{"id":"b34b5b20e6a54d6f","type":"tab","label":"Piec","disabled":false,"info":""},{"id":"fba4eb03b808932c","type":"tab","label":"PM10","disabled":false,"info":""},{"id":"bcee1bd9591a9655","type":"tab","label":"MQTT","disabled":false,"info":""},{"id":"78e0f45783bb3ba6","type":"webthingsio-gateway","name":"Gateway","host":"127.0.0.1","port":"8080","https":false,"accessToken":"eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwOTk5MmQwLWVhZmItNDJjNS04YmIzLWExN2NmNTVlM2ZmMyJ9.eyJjbGllbnRfaWQiOiJsb2NhbC10b2tlbiIsInJvbGUiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZSI6Ii90aGluZ3M6cmVhZHdyaXRlIiwiaWF0IjoxNjMyMTQ4MDAxLCJpc3MiOiJodHRwczovL20ud2VidGhpbmdzLmlvIn0.lFrwRHZiMyQndOM8_Qqa6CKhyboqVJpsLPw2-hqEOt0rC_zEopLN9xiQ6c-jO9qpnV7KdcDrYprHyxJqs1B29g","skipValidation":false},{"id":"4a220e7de4c66cea","type":"mqtt-broker","name":"","broker":"192.168.10.100","port":"1883","clientid":"","usetls":false,"protocolVersion":"4","keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","birthMsg":{},"closeTopic":"","closeQos":"0","closePayload":"","closeMsg":{},"willTopic":"","willQos":"0","willPayload":"","willMsg":{},"sessionExpiry":""},{"id":"5d87b9f621a97cd0","type":"inject","z":"2641e2d8a125e03d","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"1","crontab":"","once":true,"onceDelay":0.1,"topic":"","payloadType":"date","x":140,"y":180,"wires":[["f154454562395609"]]},{"id":"f154454562395609","type":"http request","z":"2641e2d8a125e03d","name":"","method":"GET","ret":"txt","paytoqs":"ignore","url":"http://192.168.10.206/status.html","tls":"","persist":true,"proxy":"","authType":"basic","x":180,"y":260,"wires":[["9cfa0c5e18f1211e"]]},{"id":"7ad50d18eefe3d68","type":"debug","z":"2641e2d8a125e03d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":670,"y":480,"wires":[]},{"id":"9cfa0c5e18f1211e","type":"function","z":"2641e2d8a125e03d","name":"","func":"const regex = /(?<=var webdata_now_p = \\\")\\d*/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseInt(m)};\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":380,"wires":[["7ad50d18eefe3d68","9a49aae2168bca55"]]},{"id":"9a49aae2168bca55","type":"webthingsio-set-property","z":"2641e2d8a125e03d","name":"Sofar","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-7e06d90b-5f3c-483a-aa2d-5fd311b4796e","property":"Power","inputMode":"injected","x":820,"y":300,"wires":[]},{"id":"f4353defcdb2da35","type":"webthingsio-get-property","z":"c5301cf5736b9aec","name":"aktualna z termometra","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.205-things-ccs811","property":"room_temp","x":170,"y":120,"wires":[["7d4115fb074c7f39","e9ea0b2e9c26172e"]]},{"id":"2cccaa2e01270375","type":"webthingsio-set-property","z":"c5301cf5736b9aec","name":"aktualna termostat","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-80403f04-0468-40be-a141-84d7033ee350","property":"temp","inputMode":"injected","x":1050,"y":120,"wires":[]},{"id":"6037da97131f5a34","type":"inject","z":"c5301cf5736b9aec","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"4","crontab":"","once":true,"onceDelay":0.1,"topic":"","payloadType":"date","x":130,"y":40,"wires":[["f4353defcdb2da35","b2cdb499f1ec7481"]]},{"id":"b2cdb499f1ec7481","type":"webthingsio-get-property","z":"c5301cf5736b9aec","name":"zadana","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-80403f04-0468-40be-a141-84d7033ee350","property":"target","x":160,"y":440,"wires":[["4ea5dbc7d7e58c55"]]},{"id":"33702c8b8b34d5f4","type":"function","z":"c5301cf5736b9aec","name":"compare","func":"var zadana = msg.payload.zadana\nvar aktualna = msg.payload.aktualna\nvar val = false;\n\nif (parseFloat(aktualna) < parseFloat(zadana)){\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":780,"y":380,"wires":[["928731dd3e9432a4","bf699c0fd415c196"]]},{"id":"7d4115fb074c7f39","type":"function","z":"c5301cf5736b9aec","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"aktualna\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":290,"y":320,"wires":[["6fd116e090c75327","8879ab847f93f8bc"]]},{"id":"4ea5dbc7d7e58c55","type":"function","z":"c5301cf5736b9aec","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"zadana\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":290,"y":440,"wires":[["aa1518a4eeca355f","8879ab847f93f8bc"]]},{"id":"aa1518a4eeca355f","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":410,"y":480,"wires":[]},{"id":"6fd116e090c75327","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":410,"y":280,"wires":[]},{"id":"8879ab847f93f8bc","type":"join","z":"c5301cf5736b9aec","name":"","mode":"custom","build":"object","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"","count":"2","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"","reduceFixup":"","x":550,"y":380,"wires":[["33702c8b8b34d5f4","c98af1387c6d2d7d"]]},{"id":"928731dd3e9432a4","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":790,"y":340,"wires":[]},{"id":"c98af1387c6d2d7d","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":570,"y":340,"wires":[]},{"id":"11af17dd12afce45","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1030,"y":180,"wires":[]},{"id":"8e6a215b04bda242","type":"link out","z":"f6c736a1387dd46d","name":"do pieca","links":["57f07b95c4b9df52","7778e1603c3a3f64","f3f2234913e335ab","8cf6df96f2cc66fe","4a44b79ce2fd8a07"],"x":1235,"y":740,"wires":[]},{"id":"2f66173856c481c6","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":390,"y":840,"wires":[]},{"id":"bf56cc425c6cd711","type":"join","z":"f6c736a1387dd46d","name":"","mode":"custom","build":"object","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"","count":"2","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"","reduceFixup":"","x":630,"y":740,"wires":[["5a16270c2dd84dec","5d092b9f5f94ee9c"]]},{"id":"5d092b9f5f94ee9c","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":650,"y":700,"wires":[]},{"id":"2c5bdf717864fa70","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":870,"y":700,"wires":[]},{"id":"5a16270c2dd84dec","type":"function","z":"f6c736a1387dd46d","name":"compare","func":"var x = msg.payload.powrot\nvar y = msg.payload.krzywa\nvar val = false;\n\nif (parseFloat(x) < parseFloat(y)){\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":860,"y":740,"wires":[["2c5bdf717864fa70","cfc027457b279dd9"]]},{"id":"58b4a0239273c857","type":"function","z":"f6c736a1387dd46d","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"powrot\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":370,"y":800,"wires":[["2f66173856c481c6","bf56cc425c6cd711"]]},{"id":"ab17b3a6b515efa0","type":"function","z":"f6c736a1387dd46d","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"krzywa\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":370,"y":680,"wires":[["bc99dddf85f2ca88","bf56cc425c6cd711"]]},{"id":"bc99dddf85f2ca88","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":390,"y":720,"wires":[]},{"id":"f8cfd6bd1cd1abc9","type":"webthingsio-get-property","z":"f6c736a1387dd46d","name":"powrót C.O.","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasBasement","property":"floor_temp6","x":130,"y":660,"wires":[["44cfa6493bde0629","58b4a0239273c857"]]},{"id":"eb35ae618fb0a061","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"5","crontab":"","once":true,"onceDelay":0.1,"topic":"","payloadType":"date","x":110,"y":60,"wires":[["f8cfd6bd1cd1abc9","bc55063b4bc04992"]]},{"id":"a5f5a08b5bae89d4","type":"webthingsio-set-property","z":"f6c736a1387dd46d","name":"Zadana powrotu c.o.","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a068796d-0900-40ca-8733-493e39007c98","property":"target","inputMode":"injected","x":1200,"y":80,"wires":[]},{"id":"cfc027457b279dd9","type":"switch","z":"f6c736a1387dd46d","name":"","property":"payload","propertyType":"msg","rules":[{"t":"cont","v":"true","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":1070,"y":740,"wires":[["1f94f7c7209d8af7","8e6a215b04bda242","f07dfdf7bf2af80f"]]},{"id":"1f94f7c7209d8af7","type":"trigger","z":"f6c736a1387dd46d","name":"","op1":"true","op2":"false","op1type":"str","op2type":"str","duration":"3","extend":true,"overrideDelay":false,"units":"min","reset":"","bytopic":"all","topic":"topic","outputs":1,"x":890,"y":940,"wires":[["cb131f65bec96921","03f9da7787faad41"]]},{"id":"cb131f65bec96921","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":890,"y":1000,"wires":[]},{"id":"03f9da7787faad41","type":"change","z":"f6c736a1387dd46d","name":"","rules":[{"t":"change","p":"payload","pt":"msg","from":"true","fromt":"bool","to":"heating","tot":"str"},{"t":"change","p":"payload","pt":"msg","from":"false","fromt":"bool","to":"off","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":1150,"y":1080,"wires":[["41b39dc05b03b6cb","e88f0e81c31b6ffb"]]},{"id":"41b39dc05b03b6cb","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1140,"y":1120,"wires":[]},{"id":"e88f0e81c31b6ffb","type":"webthingsio-set-property","z":"f6c736a1387dd46d","name":"heating","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a068796d-0900-40ca-8733-493e39007c98","property":"heating","inputMode":"injected","x":1160,"y":1020,"wires":[]},{"id":"908b25b4553431b9","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1010,"y":340,"wires":[]},{"id":"bf699c0fd415c196","type":"switch","z":"c5301cf5736b9aec","name":"","property":"payload","propertyType":"msg","rules":[{"t":"cont","v":"true","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":990,"y":380,"wires":[["908b25b4553431b9","40eba78f6091e98f","c951f96482088511"]]},{"id":"40eba78f6091e98f","type":"trigger","z":"c5301cf5736b9aec","name":"","op1":"true","op2":"false","op1type":"str","op2type":"str","duration":"3","extend":true,"overrideDelay":false,"units":"min","reset":"","bytopic":"all","topic":"topic","outputs":1,"x":830,"y":740,"wires":[["be4ba050b71acc55","5dc0b8c3985d52b1"]]},{"id":"be4ba050b71acc55","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":830,"y":800,"wires":[]},{"id":"05ccf6861e5e04c6","type":"webthingsio-set-property","z":"c5301cf5736b9aec","name":"heating","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-80403f04-0468-40be-a141-84d7033ee350","property":"heat","inputMode":"injected","x":1300,"y":860,"wires":[]},{"id":"5dc0b8c3985d52b1","type":"change","z":"c5301cf5736b9aec","name":"","rules":[{"t":"change","p":"payload","pt":"msg","from":"true","fromt":"bool","to":"heating","tot":"str"},{"t":"change","p":"payload","pt":"msg","from":"false","fromt":"bool","to":"off","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":1090,"y":880,"wires":[["05ccf6861e5e04c6","dabb4c135037de52"]]},{"id":"dabb4c135037de52","type":"debug","z":"c5301cf5736b9aec","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1170,"y":940,"wires":[]},{"id":"ca3b010d3fbf8040","type":"trigger","z":"b34b5b20e6a54d6f","name":"","op1":"true","op2":"false","op1type":"str","op2type":"str","duration":"3","extend":true,"overrideDelay":false,"units":"min","reset":"","bytopic":"all","topic":"topic","outputs":1,"x":1010,"y":480,"wires":[["0b3915b0a444f5f9","c3cf7ff7a87392a8"]]},{"id":"0b3915b0a444f5f9","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1050,"y":440,"wires":[]},{"id":"c3cf7ff7a87392a8","type":"webthingsio-set-property","z":"b34b5b20e6a54d6f","name":"piec gazowy","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.201-things-switch","property":"on","inputMode":"injected","x":1250,"y":480,"wires":[]},{"id":"c951f96482088511","type":"link out","z":"c5301cf5736b9aec","name":"do pieca c.o.","links":["4a44b79ce2fd8a07","232059b3ff86fdfd"],"x":1235,"y":380,"wires":[]},{"id":"4a44b79ce2fd8a07","type":"link in","z":"b34b5b20e6a54d6f","name":"z termostatu","links":["5fd16799c62483ed","8e6a215b04bda242","c951f96482088511"],"x":135,"y":140,"wires":[["2211ea2f6d18ff04","53e17e7f7cb347fc"]]},{"id":"2211ea2f6d18ff04","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":330,"y":60,"wires":[]},{"id":"f07dfdf7bf2af80f","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1090,"y":700,"wires":[]},{"id":"e9ea0b2e9c26172e","type":"switch","z":"c5301cf5736b9aec","name":"check if number","property":"payload","propertyType":"msg","rules":[{"t":"istype","v":"number","vt":"number"}],"checkall":"true","repair":false,"outputs":1,"x":480,"y":120,"wires":[["431a5e6844d54f70"]]},{"id":"8f6b28c43b13673c","type":"webthingsio-set-property","z":"f6c736a1387dd46d","name":"Krzywa termostat powrót c.o.","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a068796d-0900-40ca-8733-493e39007c98","property":"real","inputMode":"injected","x":520,"y":980,"wires":[]},{"id":"c471698e3c4da9bb","type":"function","z":"f6c736a1387dd46d","name":"round to 1 decimal place","func":"var number = msg.payload\nvar rounded = Math.round(number*10)/10\nvar newMsg = {payload: rounded}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":930,"y":80,"wires":[["a5f5a08b5bae89d4","95bb47af7538beb9"]]},{"id":"95bb47af7538beb9","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":910,"y":20,"wires":[]},{"id":"44cfa6493bde0629","type":"function","z":"f6c736a1387dd46d","name":"round to 2 decimal place","func":"var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":190,"y":980,"wires":[["505b757bc94c71cf","8f6b28c43b13673c"]]},{"id":"505b757bc94c71cf","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":170,"y":920,"wires":[]},{"id":"743064ef32f4fd9b","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"off","payloadType":"str","x":1150,"y":940,"wires":[["e88f0e81c31b6ffb"]]},{"id":"431a5e6844d54f70","type":"function","z":"c5301cf5736b9aec","name":"round to 2 decimal place","func":"var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":750,"y":120,"wires":[["2cccaa2e01270375","11af17dd12afce45"]]},{"id":"e85bc33b2c5e6bb5","type":"inject","z":"b98894ba757de358","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"6","crontab":"","once":true,"onceDelay":0.1,"topic":"","payloadType":"date","x":170,"y":480,"wires":[["953addaa8e2adf1c","8b7d04e782ae7850","ac952e0f7fec7cf0","ae2167dc7fb05393","94becef25ff006c6"]]},{"id":"953addaa8e2adf1c","type":"webthingsio-get-property","z":"b98894ba757de358","name":"Zasilanie podłogówki","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasBasement","property":"floor_temp3","x":160,"y":560,"wires":[["200e349368fccea0"]]},{"id":"853a189684091ae4","type":"function","z":"b98894ba757de358","name":"compare","func":"var val = false;\nvar max_water = 40;\nvar max_floor = 35;\nif(\n(parseFloat(msg.payload.zasilanie) < max_water) & \n(parseFloat(msg.payload.powrot) < max_water) &\n(parseFloat(msg.payload.podloga1) < max_floor) &\n(parseFloat(msg.payload.podloga2) < max_floor)\n)\n{\n    val = true;\n}\n\nvar newMsg = {payload: val, topic: \"ponizej_max\"}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":880,"y":560,"wires":[["99fb5703b625f430"]]},{"id":"d11d00c69017d691","type":"switch","z":"b98894ba757de358","name":"","property":"payload","propertyType":"msg","rules":[{"t":"cont","v":"true","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":990,"y":1060,"wires":[["66615a1e4896ec28","7c48d44637dd56fd","5fd16799c62483ed","665dbc8ba8208a61"]]},{"id":"66615a1e4896ec28","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":1210,"y":1000,"wires":[]},{"id":"7c48d44637dd56fd","type":"trigger","z":"b98894ba757de358","name":"","op1":"true","op2":"false","op1type":"str","op2type":"str","duration":"3","extend":true,"overrideDelay":false,"units":"min","reset":"","bytopic":"all","topic":"topic","outputs":1,"x":990,"y":1380,"wires":[["35c7c9133c1347c1","8b1d1556383bf241","5fd16799c62483ed"]]},{"id":"35c7c9133c1347c1","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":990,"y":1440,"wires":[]},{"id":"8b1d1556383bf241","type":"webthingsio-set-property","z":"b98894ba757de358","name":"Podłogowe","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.184-things-switch","property":"on","inputMode":"injected","x":1270,"y":1240,"wires":[]},{"id":"8b7d04e782ae7850","type":"webthingsio-get-property","z":"b98894ba757de358","name":"Powrót podłogówki","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasBasement","property":"floor_temp4","x":150,"y":660,"wires":[["8a7a41af6c357654"]]},{"id":"c1a82e43c0e479cd","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":390,"y":700,"wires":[]},{"id":"cbe7fab817ec85c1","type":"join","z":"b98894ba757de358","name":"","mode":"custom","build":"object","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"","count":"4","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"","reduceFixup":"","x":710,"y":560,"wires":[["24526c8e0ffd2187","853a189684091ae4"]]},{"id":"24526c8e0ffd2187","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":730,"y":520,"wires":[]},{"id":"8a7a41af6c357654","type":"function","z":"b98894ba757de358","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"powrot\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":370,"y":660,"wires":[["c1a82e43c0e479cd","cbe7fab817ec85c1"]]},{"id":"200e349368fccea0","type":"function","z":"b98894ba757de358","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"zasilanie\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":370,"y":560,"wires":[["b1835b95559f8498","cbe7fab817ec85c1"]]},{"id":"b1835b95559f8498","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":390,"y":600,"wires":[]},{"id":"ac952e0f7fec7cf0","type":"webthingsio-get-property","z":"b98894ba757de358","name":"Podłoga 1","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasFloor","property":"floor_temp1","x":120,"y":780,"wires":[["296f593a06054bd7"]]},{"id":"ae2167dc7fb05393","type":"webthingsio-get-property","z":"b98894ba757de358","name":"Podłoga 2","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasFloor","property":"floor_temp2","x":120,"y":860,"wires":[["1fe02906810c18e8"]]},{"id":"a0ad0b47a3b1f404","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":390,"y":900,"wires":[]},{"id":"1fe02906810c18e8","type":"function","z":"b98894ba757de358","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"podloga2\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":370,"y":860,"wires":[["a0ad0b47a3b1f404","cbe7fab817ec85c1","2354f5e492c096a5"]]},{"id":"296f593a06054bd7","type":"function","z":"b98894ba757de358","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"podloga1\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":370,"y":780,"wires":[["94dc972973a9026c","cbe7fab817ec85c1","2354f5e492c096a5"]]},{"id":"94dc972973a9026c","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":390,"y":820,"wires":[]},{"id":"87f1a4216f7be430","type":"inject","z":"c5301cf5736b9aec","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"off","payloadType":"str","x":1290,"y":740,"wires":[["05ccf6861e5e04c6"]]},{"id":"2c14b5af20412507","type":"link out","z":"4a573f048a4dd2d3","name":"sygnał wzbudzający od krzywej grzewczej podłogówki","links":["b424a40bb59a0e80"],"x":1255,"y":700,"wires":[]},{"id":"a422d15e17e6d39d","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":410,"y":800,"wires":[]},{"id":"32fa8aca1ed22950","type":"join","z":"4a573f048a4dd2d3","name":"","mode":"custom","build":"object","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"","count":"2","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"","reduceFixup":"","x":650,"y":700,"wires":[["2253e04b6f61fbd1","96fedaf3681a224b"]]},{"id":"96fedaf3681a224b","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":670,"y":660,"wires":[]},{"id":"ad090c914c73318e","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":890,"y":660,"wires":[]},{"id":"2253e04b6f61fbd1","type":"function","z":"4a573f048a4dd2d3","name":"compare","func":"var x = msg.payload.powrot\nvar y = msg.payload.krzywa\nvar val = false;\n\nif (parseFloat(x) < parseFloat(y)){\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":880,"y":700,"wires":[["ad090c914c73318e","0c8b9be8e6ef0804"]]},{"id":"346ebf973b517605","type":"function","z":"4a573f048a4dd2d3","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"powrot\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":390,"y":760,"wires":[["a422d15e17e6d39d","32fa8aca1ed22950"]]},{"id":"ee63b8db33eae661","type":"function","z":"4a573f048a4dd2d3","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"krzywa\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":390,"y":640,"wires":[["0b6d37475b9227d2","32fa8aca1ed22950"]]},{"id":"0b6d37475b9227d2","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":410,"y":680,"wires":[]},{"id":"ef30c12dcb7ca9a6","type":"webthingsio-get-property","z":"4a573f048a4dd2d3","name":"Powrót podłogówki","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasBasement","property":"floor_temp4","x":130,"y":600,"wires":[["2dad1cd9aa746692","346ebf973b517605"]]},{"id":"162fad0c350e8572","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"5","crontab":"","once":true,"onceDelay":0.1,"topic":"","payloadType":"date","x":90,"y":80,"wires":[["ef30c12dcb7ca9a6","bf92692bed302d3f"]]},{"id":"af492d27bbedd386","type":"webthingsio-set-property","z":"4a573f048a4dd2d3","name":"Zadana podłogi","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674","property":"target","inputMode":"injected","x":1300,"y":80,"wires":[]},{"id":"0c8b9be8e6ef0804","type":"switch","z":"4a573f048a4dd2d3","name":"","property":"payload","propertyType":"msg","rules":[{"t":"cont","v":"true","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":1090,"y":700,"wires":[["5923d10c87d76715","2c14b5af20412507","5d6eccb2688bbfc1"]]},{"id":"5923d10c87d76715","type":"trigger","z":"4a573f048a4dd2d3","name":"","op1":"true","op2":"false","op1type":"str","op2type":"str","duration":"3","extend":true,"overrideDelay":false,"units":"min","reset":"","bytopic":"all","topic":"topic","outputs":1,"x":930,"y":1160,"wires":[["0f90c0079be54df6","60a0fa8776ad0e36"]]},{"id":"0f90c0079be54df6","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":930,"y":1220,"wires":[]},{"id":"60a0fa8776ad0e36","type":"change","z":"4a573f048a4dd2d3","name":"","rules":[{"t":"change","p":"payload","pt":"msg","from":"true","fromt":"bool","to":"heating","tot":"str"},{"t":"change","p":"payload","pt":"msg","from":"false","fromt":"bool","to":"off","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":1190,"y":1300,"wires":[["ba122129d14ac7de","3e892c6e31ec33b0"]]},{"id":"ba122129d14ac7de","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1180,"y":1340,"wires":[]},{"id":"3e892c6e31ec33b0","type":"webthingsio-set-property","z":"4a573f048a4dd2d3","name":"heating","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674","property":"heating","inputMode":"injected","x":1200,"y":1240,"wires":[]},{"id":"5d6eccb2688bbfc1","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1110,"y":660,"wires":[]},{"id":"5d53a6aa53249860","type":"webthingsio-set-property","z":"4a573f048a4dd2d3","name":"Krzywa termostat powrót podłogowe","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674","property":"real","inputMode":"injected","x":570,"y":940,"wires":[]},{"id":"4b9e76ba86d95305","type":"function","z":"4a573f048a4dd2d3","name":"round to 2 decimal place","func":"var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":1150,"y":200,"wires":[["52656ccb84754ed8","af492d27bbedd386"]]},{"id":"52656ccb84754ed8","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1090,"y":80,"wires":[]},{"id":"2dad1cd9aa746692","type":"function","z":"4a573f048a4dd2d3","name":"round to 2 decimal place","func":"var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":210,"y":940,"wires":[["835c542f9bb8c484","5d53a6aa53249860"]]},{"id":"835c542f9bb8c484","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":190,"y":880,"wires":[]},{"id":"7794c795eff2f682","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"off","payloadType":"str","x":1170,"y":1100,"wires":[["3e892c6e31ec33b0"]]},{"id":"99fb5703b625f430","type":"join","z":"b98894ba757de358","name":"","mode":"custom","build":"object","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"","count":"2","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"num","reduceFixup":"","x":570,"y":1060,"wires":[["78e39a9319b58485","736e0a2d44075ede"]]},{"id":"78e39a9319b58485","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":590,"y":1020,"wires":[]},{"id":"b424a40bb59a0e80","type":"link in","z":"b98894ba757de358","name":"sygnał z podłogówki do sprawdzenia","links":["2c14b5af20412507"],"x":115,"y":1060,"wires":[["c2711a6a0b2957f1"]]},{"id":"c2711a6a0b2957f1","type":"function","z":"b98894ba757de358","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"wlacz\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":210,"y":1060,"wires":[["882d9c1214d6129a","99fb5703b625f430"]]},{"id":"882d9c1214d6129a","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":190,"y":1120,"wires":[]},{"id":"736e0a2d44075ede","type":"function","z":"b98894ba757de358","name":"check","func":"var val = false;\n\nif (msg.payload.wlacz & msg.payload.ponizej_max)\n    val = true;\n\nvar newMsg = {payload: val}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":770,"y":1060,"wires":[["d11d00c69017d691","cb79ace3afb24899"]]},{"id":"5fd16799c62483ed","type":"link out","z":"b98894ba757de358","name":"sygnał z podłogówki dla pieca","links":["4a44b79ce2fd8a07"],"x":1225,"y":1460,"wires":[]},{"id":"eba2fd09666196c3","type":"spline-curve","z":"4a573f048a4dd2d3","name":"","output_key":"payload","input_key":"payload","points":[{"x":0,"y":0.44},{"x":0.3,"y":0.5},{"x":0.6,"y":0.61},{"x":0.75,"y":0.65},{"x":1,"y":0.67}],"x":830,"y":360,"wires":[["9f010844cf1d7282","61f6086019e7302a"]]},{"id":"60d4c4b421668876","type":"function","z":"4a573f048a4dd2d3","name":"map","func":"var input = msg.payload\n\nvar newMsg = {payload: -(input/40)+0.5}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":630,"y":360,"wires":[["d65af0c09e9f05d3","eba2fd09666196c3"]]},{"id":"d65af0c09e9f05d3","type":"debug","z":"4a573f048a4dd2d3","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":650,"y":320,"wires":[]},{"id":"9f010844cf1d7282","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":850,"y":420,"wires":[]},{"id":"61f6086019e7302a","type":"function","z":"4a573f048a4dd2d3","name":"map","func":"var input = msg.payload\n\nvar newMsg = {payload: (input*40)+10}\n\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":1110,"y":360,"wires":[["0f8129b99956f61b","4b9e76ba86d95305","ee63b8db33eae661"]]},{"id":"0f8129b99956f61b","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1170,"y":320,"wires":[]},{"id":"20d6e20ef0226fa2","type":"switch","z":"4a573f048a4dd2d3","name":"<=17 filter","property":"payload","propertyType":"msg","rules":[{"t":"lte","v":"17","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":440,"y":360,"wires":[["60d4c4b421668876"]]},{"id":"bf92692bed302d3f","type":"webthingsio-get-property","z":"4a573f048a4dd2d3","name":"zewnetrzna","gateway":"78e0f45783bb3ba6","thing":"weather-f4d390665081060b0dfc89ddeddf9441105acb1c","property":"feelsLike","x":270,"y":360,"wires":[["20d6e20ef0226fa2","2f630299f67850c1"]]},{"id":"2f630299f67850c1","type":"debug","z":"4a573f048a4dd2d3","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":270,"y":420,"wires":[]},{"id":"82f64e0b6475d0d9","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"-10","payloadType":"str","x":450,"y":220,"wires":[["60d4c4b421668876"]]},{"id":"3aed71bfda369fad","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"-20","payloadType":"str","x":450,"y":260,"wires":[["60d4c4b421668876"]]},{"id":"30cf5a35d82f4301","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"-25","payloadType":"str","x":450,"y":300,"wires":[["60d4c4b421668876"]]},{"id":"e871a394327db078","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"1","payloadType":"str","x":930,"y":240,"wires":[["61f6086019e7302a"]]},{"id":"f96649845297d58d","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"0","payloadType":"str","x":930,"y":320,"wires":[["61f6086019e7302a"]]},{"id":"d02b956920dca980","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"0.5","payloadType":"str","x":930,"y":280,"wires":[["61f6086019e7302a"]]},{"id":"4a995d7caa65dd06","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"0","payloadType":"str","x":450,"y":180,"wires":[["60d4c4b421668876"]]},{"id":"1570d45fdee7f2f9","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"10","payloadType":"str","x":450,"y":140,"wires":[["60d4c4b421668876"]]},{"id":"6e530b85eea5613c","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"20","payloadType":"str","x":450,"y":100,"wires":[["60d4c4b421668876"]]},{"id":"a732f420980598c6","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"25","payloadType":"str","x":450,"y":60,"wires":[["60d4c4b421668876"]]},{"id":"f18d43f7a481c444","type":"spline-curve","z":"f6c736a1387dd46d","name":"","output_key":"payload","input_key":"payload","points":[{"x":0,"y":0.2},{"x":0.3,"y":0.34},{"x":0.5,"y":0.424},{"x":1,"y":0.5}],"x":850,"y":340,"wires":[["3e19a5dc5b118470","dba705e0195bd88d"]]},{"id":"a36fbc703d26ac24","type":"function","z":"f6c736a1387dd46d","name":"map","func":"var input = msg.payload\n\nvar newMsg = {payload: -(input/40)+0.5}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":650,"y":340,"wires":[["7847a1d19849b1fe","f18d43f7a481c444"]]},{"id":"7847a1d19849b1fe","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":670,"y":300,"wires":[]},{"id":"3e19a5dc5b118470","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":870,"y":400,"wires":[]},{"id":"dba705e0195bd88d","type":"function","z":"f6c736a1387dd46d","name":"map","func":"var input = msg.payload\n\nvar newMsg = {payload: (input*40)+10}\n\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":1130,"y":340,"wires":[["f211319f0f0d248a","c471698e3c4da9bb","ab17b3a6b515efa0"]]},{"id":"f211319f0f0d248a","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1190,"y":300,"wires":[]},{"id":"d7b53660af63f68f","type":"switch","z":"f6c736a1387dd46d","name":"<=17 filter","property":"payload","propertyType":"msg","rules":[{"t":"lte","v":"17","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":460,"y":340,"wires":[["a36fbc703d26ac24"]]},{"id":"bc55063b4bc04992","type":"webthingsio-get-property","z":"f6c736a1387dd46d","name":"zewnetrzna","gateway":"78e0f45783bb3ba6","thing":"weather-f4d390665081060b0dfc89ddeddf9441105acb1c","property":"feelsLike","x":290,"y":340,"wires":[["d7b53660af63f68f","31e24770e42531cf"]]},{"id":"31e24770e42531cf","type":"debug","z":"f6c736a1387dd46d","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":290,"y":400,"wires":[]},{"id":"1f65b76281ae9d63","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"-10","payloadType":"str","x":470,"y":200,"wires":[["a36fbc703d26ac24"]]},{"id":"200c3e298950014b","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"-20","payloadType":"str","x":470,"y":240,"wires":[["a36fbc703d26ac24"]]},{"id":"d76928da30a80793","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"-25","payloadType":"str","x":470,"y":280,"wires":[["a36fbc703d26ac24"]]},{"id":"eda22fc55265567f","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"1","payloadType":"str","x":950,"y":220,"wires":[["dba705e0195bd88d"]]},{"id":"13921c97361a93cd","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"0","payloadType":"str","x":950,"y":300,"wires":[["dba705e0195bd88d"]]},{"id":"2327adb188b53098","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"0.5","payloadType":"str","x":950,"y":260,"wires":[["dba705e0195bd88d"]]},{"id":"6af1703d7cef7da5","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"0","payloadType":"str","x":470,"y":160,"wires":[["a36fbc703d26ac24"]]},{"id":"b8381b9e5698728b","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"10","payloadType":"str","x":470,"y":120,"wires":[["a36fbc703d26ac24"]]},{"id":"598514d20e115af3","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"20","payloadType":"str","x":470,"y":80,"wires":[["a36fbc703d26ac24"]]},{"id":"1f35ed3c795b3c73","type":"inject","z":"f6c736a1387dd46d","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"25","payloadType":"str","x":470,"y":40,"wires":[["a36fbc703d26ac24"]]},{"id":"cb79ace3afb24899","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":870,"y":980,"wires":[]},{"id":"45378c9a0f33e56a","type":"webthingsio-get-property","z":"b34b5b20e6a54d6f","name":"Podłoga 1","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasFloor","property":"floor_temp1","x":220,"y":460,"wires":[["e4847999ac15b93e"]]},{"id":"17f1f930b5a635c8","type":"webthingsio-get-property","z":"b34b5b20e6a54d6f","name":"Podłoga 2","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasFloor","property":"floor_temp2","x":220,"y":540,"wires":[["7531de5794b18619"]]},{"id":"a7a3d5c6cb120bb7","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":490,"y":580,"wires":[]},{"id":"7531de5794b18619","type":"function","z":"b34b5b20e6a54d6f","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"podloga2\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":470,"y":540,"wires":[["a7a3d5c6cb120bb7","291ff33ed60b5545"]]},{"id":"e4847999ac15b93e","type":"function","z":"b34b5b20e6a54d6f","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"podloga1\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":470,"y":460,"wires":[["a5ad14e81b75b7d5","291ff33ed60b5545"]]},{"id":"a5ad14e81b75b7d5","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":490,"y":500,"wires":[]},{"id":"841dd0ecfd0264fa","type":"inject","z":"b34b5b20e6a54d6f","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"6","crontab":"","once":true,"onceDelay":0.1,"topic":"","payloadType":"date","x":250,"y":360,"wires":[["45378c9a0f33e56a","17f1f930b5a635c8"]]},{"id":"291ff33ed60b5545","type":"join","z":"b34b5b20e6a54d6f","name":"","mode":"custom","build":"object","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"","count":"3","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"","reduceFixup":"","x":690,"y":260,"wires":[["785ae51f61701a64","d7826eb7066dc94f"]]},{"id":"785ae51f61701a64","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":710,"y":220,"wires":[]},{"id":"d7826eb7066dc94f","type":"function","z":"b34b5b20e6a54d6f","name":"zabezpiecz podłogę","func":"var val = false;\nvar max_max_floor = 35;\nif(\n(msg.payload.grzej) & \n(parseFloat(msg.payload.podloga1) < max_max_floor) &\n(parseFloat(msg.payload.podloga2) < max_max_floor)\n)\n{\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":920,"y":260,"wires":[["356a223ed7a05f35","d4d5086e867abe13"]]},{"id":"53e17e7f7cb347fc","type":"function","z":"b34b5b20e6a54d6f","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"grzej\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":290,"y":140,"wires":[["51820460fb02641e","291ff33ed60b5545"]]},{"id":"51820460fb02641e","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":310,"y":180,"wires":[]},{"id":"356a223ed7a05f35","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":890,"y":220,"wires":[]},{"id":"d4d5086e867abe13","type":"switch","z":"b34b5b20e6a54d6f","name":"","property":"payload","propertyType":"msg","rules":[{"t":"cont","v":"true","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":1090,"y":260,"wires":[["5749cf7d9589162f","ca3b010d3fbf8040","c3cf7ff7a87392a8"]]},{"id":"5749cf7d9589162f","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1110,"y":220,"wires":[]},{"id":"18303ade58d3856b","type":"inject","z":"fba4eb03b808932c","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"60","crontab":"","once":true,"onceDelay":0.1,"topic":"","payloadType":"date","x":210,"y":200,"wires":[["4ab5f024937c22ab"]]},{"id":"4ab5f024937c22ab","type":"http request","z":"fba4eb03b808932c","name":"","method":"GET","ret":"txt","paytoqs":"ignore","url":"https://api.syngeos.pl/api/public/widget.html?deviceId=1126&sensorsList[]=pm10&template=horizontal&theme=dark","tls":"","persist":true,"proxy":"","authType":"","x":250,"y":280,"wires":[["faab8e2e6bd88422","e9e254f0e5e91f2c"]]},{"id":"40ee668a6dda3267","type":"debug","z":"fba4eb03b808932c","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":470,"y":360,"wires":[]},{"id":"faab8e2e6bd88422","type":"function","z":"fba4eb03b808932c","name":"","func":"const regex = /\\d*\\.?\\d*(?= µg\\/m³)/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseFloat(m).toString()};\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":430,"y":400,"wires":[["40ee668a6dda3267","c5ab8e3d8b9177e9"]]},{"id":"410748a3dfee8cb1","type":"webthingsio-set-property","z":"fba4eb03b808932c","name":"pm10 gęstość","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-e98369aa-4f40-4ecd-b905-4a26a7e639ba","property":"pm10density","inputMode":"injected","x":700,"y":400,"wires":[]},{"id":"332e0c5965c5e196","type":"debug","z":"fba4eb03b808932c","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":470,"y":480,"wires":[]},{"id":"e9e254f0e5e91f2c","type":"function","z":"fba4eb03b808932c","name":"","func":"const regex = /(?<=<p class=\"widget-body__value\">)\\d*/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseInt(m)};\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":430,"y":520,"wires":[["332e0c5965c5e196","e7e1f4dfe16e0c3e"]]},{"id":"e7e1f4dfe16e0c3e","type":"webthingsio-set-property","z":"fba4eb03b808932c","name":"pm10 procent","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-e98369aa-4f40-4ecd-b905-4a26a7e639ba","property":"pm10percentage","inputMode":"injected","x":700,"y":520,"wires":[]},{"id":"c5ab8e3d8b9177e9","type":"function","z":"fba4eb03b808932c","name":"round to 2 decimal place","func":"var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":610,"y":280,"wires":[["db2655a891c5d994","410748a3dfee8cb1"]]},{"id":"db2655a891c5d994","type":"debug","z":"fba4eb03b808932c","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":530,"y":160,"wires":[]},{"id":"cbdba19843b80737","type":"catch","z":"b98894ba757de358","name":"","scope":null,"uncaught":false,"x":140,"y":1340,"wires":[["8e258ecc994fcfc6"]]},{"id":"8e258ecc994fcfc6","type":"change","z":"b98894ba757de358","name":"","rules":[{"t":"set","p":"payload","pt":"msg","to":"false","tot":"str"},{"t":"set","p":"topic","pt":"msg","to":"error","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":320,"y":1340,"wires":[["8b1d1556383bf241","f9de74ce876ed165"]]},{"id":"f3d5abbe17e23b76","type":"catch","z":"b34b5b20e6a54d6f","name":"","scope":["45378c9a0f33e56a","17f1f930b5a635c8"],"uncaught":false,"x":190,"y":720,"wires":[["8fffb3958688949d"]]},{"id":"8fffb3958688949d","type":"change","z":"b34b5b20e6a54d6f","name":"","rules":[{"t":"set","p":"payload","pt":"msg","to":"false","tot":"str"},{"t":"set","p":"topic","pt":"msg","to":"error","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":380,"y":720,"wires":[["c3cf7ff7a87392a8","b7ed7eb0cfbcc74d"]]},{"id":"b7ed7eb0cfbcc74d","type":"debug","z":"b34b5b20e6a54d6f","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":400,"y":780,"wires":[]},{"id":"f9de74ce876ed165","type":"debug","z":"b98894ba757de358","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":310,"y":1400,"wires":[]},{"id":"d0d5971f8aedeaae","type":"mqtt in","z":"bcee1bd9591a9655","name":"","topic":"#","qos":"2","datatype":"auto","broker":"4a220e7de4c66cea","nl":false,"rap":true,"rh":0,"x":250,"y":580,"wires":[["a23348405d377208"]]},{"id":"a23348405d377208","type":"debug","z":"bcee1bd9591a9655","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":410,"y":580,"wires":[]},{"id":"5a3a7395e3c73a58","type":"debug","z":"bcee1bd9591a9655","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":1010,"y":340,"wires":[]},{"id":"79143db6331d7082","type":"mqtt out","z":"bcee1bd9591a9655","name":"","topic":"roomtemp","qos":"","retain":"","respTopic":"","contentType":"","userProps":"","correl":"","expiry":"","broker":"4a220e7de4c66cea","x":1120,"y":420,"wires":[]},{"id":"5f10c9cfcc8684cb","type":"inject","z":"bcee1bd9591a9655","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"60","crontab":"","once":false,"onceDelay":0.1,"topic":"f1","payloadType":"date","x":160,"y":420,"wires":[["9c8d7c8f4bbd217f","9b644188a817b0bb","26f5abf20e25a6bb"]]},{"id":"94becef25ff006c6","type":"webthingsio-get-property","z":"b98894ba757de358","name":"Powrót C.O.","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-dallasBasement","property":"floor_temp6","x":130,"y":1220,"wires":[["db602fd7bcd8d072"]]},{"id":"2354f5e492c096a5","type":"join","z":"b98894ba757de358","name":"","mode":"custom","build":"object","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"","count":"3","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"num","reduceFixup":"","x":510,"y":1220,"wires":[["1e0cf06f38fae937","c5491d7a636044a5"]]},{"id":"1e0cf06f38fae937","type":"function","z":"b98894ba757de358","name":"czy piec grzeje","func":"var val = true;\nif(\n(parseFloat(msg.payload.podloga1) > \nparseFloat(msg.payload.powrotco)) ||\n(parseFloat(msg.payload.podloga2) > \nparseFloat(msg.payload.powrotco))\n)\n{\n    val = false;\n}\nvar newMsg = {payload: val}\nreturn newMsg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":700,"y":1220,"wires":[["fa4d406727f81295","d895378edd4e260d"]]},{"id":"c5491d7a636044a5","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":570,"y":1160,"wires":[]},{"id":"fa4d406727f81295","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":750,"y":1160,"wires":[]},{"id":"db602fd7bcd8d072","type":"function","z":"b98894ba757de358","name":"wrap","func":"msg = {payload:msg.payload,\n    topic:\"powrotco\"\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":290,"y":1220,"wires":[["53c235edeaf98b74","2354f5e492c096a5"]]},{"id":"53c235edeaf98b74","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":310,"y":1260,"wires":[]},{"id":"d895378edd4e260d","type":"switch","z":"b98894ba757de358","name":"","property":"payload","propertyType":"msg","rules":[{"t":"cont","v":"false","vt":"str"}],"checkall":"true","repair":false,"outputs":1,"x":890,"y":1220,"wires":[["8b1d1556383bf241","a172b547f6a036ff"]]},{"id":"a172b547f6a036ff","type":"debug","z":"b98894ba757de358","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":930,"y":1160,"wires":[]},{"id":"58e8155972293301","type":"comment","z":"b98894ba757de358","name":"Uwaga!!","info":"Zasilanie podłogówki musi być z powrotu CO.\nTemperatura powrotu CO jest sprawdzana!!\nMusi być wyższa niż temperatura podłogi.","x":700,"y":1260,"wires":[]},{"id":"665dbc8ba8208a61","type":"delay","z":"b98894ba757de358","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"1","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"allowrate":false,"x":1200,"y":1120,"wires":[["8b1d1556383bf241"]]},{"id":"d92fb2e09c67bd43","type":"mqtt out","z":"bcee1bd9591a9655","name":"","topic":"zadanapodlogowego","qos":"","retain":"","respTopic":"","contentType":"","userProps":"","correl":"","expiry":"","broker":"4a220e7de4c66cea","x":1160,"y":460,"wires":[]},{"id":"14ad2837a3ce422b","type":"mqtt out","z":"bcee1bd9591a9655","name":"","topic":"rzeczywistapodlogowego","qos":"","retain":"","respTopic":"","contentType":"","userProps":"","correl":"","expiry":"","broker":"4a220e7de4c66cea","x":1170,"y":500,"wires":[]},{"id":"9c8d7c8f4bbd217f","type":"webthingsio-get-property","z":"bcee1bd9591a9655","name":"","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674","property":"real","x":710,"y":500,"wires":[["14ad2837a3ce422b"]]},{"id":"9b644188a817b0bb","type":"webthingsio-get-property","z":"bcee1bd9591a9655","name":"","gateway":"78e0f45783bb3ba6","thing":"virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674","property":"target","x":720,"y":460,"wires":[["d92fb2e09c67bd43"]]},{"id":"26f5abf20e25a6bb","type":"webthingsio-get-property","z":"bcee1bd9591a9655","name":"","gateway":"78e0f45783bb3ba6","thing":"http---192.168.10.202-things-bmp280","property":"room_temp","x":650,"y":420,"wires":[["79143db6331d7082","5a3a7395e3c73a58"]]},{"id":"f7725916b6141ffe","type":"inject","z":"b34b5b20e6a54d6f","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":true,"onceDelay":"0","topic":"","payload":"false","payloadType":"str","x":960,"y":700,"wires":[["c3cf7ff7a87392a8"]]},{"id":"bb5d2e2fb333ec44","type":"inject","z":"b98894ba757de358","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":true,"onceDelay":"0","topic":"","payload":"false","payloadType":"str","x":130,"y":1480,"wires":[["8b1d1556383bf241"]]},{"id":"160c1046aa6a8623","type":"inject","z":"4a573f048a4dd2d3","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":true,"onceDelay":"0","topic":"","payload":"off","payloadType":"str","x":1170,"y":1140,"wires":[["3e892c6e31ec33b0"]]},{"id":"fd96803ac69522a4","type":"inject","z":"c5301cf5736b9aec","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":true,"onceDelay":"0","topic":"","payload":"false","payloadType":"str","x":1290,"y":780,"wires":[["05ccf6861e5e04c6"]]}]
+[
+    {
+        "id": "2641e2d8a125e03d",
+        "type": "tab",
+        "label": "SofarSolar",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "c5301cf5736b9aec",
+        "type": "tab",
+        "label": "Termostat",
+        "disabled": false,
+        "info": "W tej zakładce będą przepływy dotyczące regulacji ogrzewania"
+    },
+    {
+        "id": "f6c736a1387dd46d",
+        "type": "tab",
+        "label": "Krzywa grzewcza c.o.",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "4a573f048a4dd2d3",
+        "type": "tab",
+        "label": "Krzywa grzewcza podłogówki",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b98894ba757de358",
+        "type": "tab",
+        "label": "Ograniczenie podłogowego",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b34b5b20e6a54d6f",
+        "type": "tab",
+        "label": "Piec",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "fba4eb03b808932c",
+        "type": "tab",
+        "label": "PM10",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "bcee1bd9591a9655",
+        "type": "tab",
+        "label": "MQTT",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "78e0f45783bb3ba6",
+        "type": "webthingsio-gateway",
+        "name": "Gateway",
+        "host": "127.0.0.1",
+        "port": "8080",
+        "https": false,
+        "accessToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjYwOTk5MmQwLWVhZmItNDJjNS04YmIzLWExN2NmNTVlM2ZmMyJ9.eyJjbGllbnRfaWQiOiJsb2NhbC10b2tlbiIsInJvbGUiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZSI6Ii90aGluZ3M6cmVhZHdyaXRlIiwiaWF0IjoxNjMyMTQ4MDAxLCJpc3MiOiJodHRwczovL20ud2VidGhpbmdzLmlvIn0.lFrwRHZiMyQndOM8_Qqa6CKhyboqVJpsLPw2-hqEOt0rC_zEopLN9xiQ6c-jO9qpnV7KdcDrYprHyxJqs1B29g",
+        "skipValidation": false
+    },
+    {
+        "id": "4a220e7de4c66cea",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.10.100",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "5d87b9f621a97cd0",
+        "type": "inject",
+        "z": "2641e2d8a125e03d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 180,
+        "wires": [
+            [
+                "f154454562395609"
+            ]
+        ]
+    },
+    {
+        "id": "f154454562395609",
+        "type": "http request",
+        "z": "2641e2d8a125e03d",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://192.168.10.206/status.html",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "authType": "basic",
+        "x": 180,
+        "y": 260,
+        "wires": [
+            [
+                "9cfa0c5e18f1211e"
+            ]
+        ]
+    },
+    {
+        "id": "7ad50d18eefe3d68",
+        "type": "debug",
+        "z": "2641e2d8a125e03d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "9cfa0c5e18f1211e",
+        "type": "function",
+        "z": "2641e2d8a125e03d",
+        "name": "",
+        "func": "const regex = /(?<=var webdata_now_p = \\\")\\d*/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseInt(m)};\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 380,
+        "wires": [
+            [
+                "7ad50d18eefe3d68",
+                "9a49aae2168bca55"
+            ]
+        ]
+    },
+    {
+        "id": "9a49aae2168bca55",
+        "type": "webthingsio-set-property",
+        "z": "2641e2d8a125e03d",
+        "name": "Sofar",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-7e06d90b-5f3c-483a-aa2d-5fd311b4796e",
+        "property": "Power",
+        "inputMode": "injected",
+        "x": 820,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "f4353defcdb2da35",
+        "type": "webthingsio-get-property",
+        "z": "c5301cf5736b9aec",
+        "name": "aktualna z termometra",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.205-things-ccs811",
+        "property": "room_temp",
+        "x": 170,
+        "y": 120,
+        "wires": [
+            [
+                "7d4115fb074c7f39",
+                "e9ea0b2e9c26172e"
+            ]
+        ]
+    },
+    {
+        "id": "2cccaa2e01270375",
+        "type": "webthingsio-set-property",
+        "z": "c5301cf5736b9aec",
+        "name": "aktualna termostat",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-80403f04-0468-40be-a141-84d7033ee350",
+        "property": "temp",
+        "inputMode": "injected",
+        "x": 1050,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "6037da97131f5a34",
+        "type": "inject",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "4",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 40,
+        "wires": [
+            [
+                "f4353defcdb2da35",
+                "b2cdb499f1ec7481"
+            ]
+        ]
+    },
+    {
+        "id": "b2cdb499f1ec7481",
+        "type": "webthingsio-get-property",
+        "z": "c5301cf5736b9aec",
+        "name": "zadana",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-80403f04-0468-40be-a141-84d7033ee350",
+        "property": "target",
+        "x": 160,
+        "y": 440,
+        "wires": [
+            [
+                "4ea5dbc7d7e58c55"
+            ]
+        ]
+    },
+    {
+        "id": "33702c8b8b34d5f4",
+        "type": "function",
+        "z": "c5301cf5736b9aec",
+        "name": "compare",
+        "func": "var zadana = msg.payload.zadana\nvar aktualna = msg.payload.aktualna\nvar val = false;\n\nif (parseFloat(aktualna) < parseFloat(zadana)){\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 380,
+        "wires": [
+            [
+                "928731dd3e9432a4",
+                "bf699c0fd415c196"
+            ]
+        ]
+    },
+    {
+        "id": "7d4115fb074c7f39",
+        "type": "function",
+        "z": "c5301cf5736b9aec",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"aktualna\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 320,
+        "wires": [
+            [
+                "6fd116e090c75327",
+                "8879ab847f93f8bc"
+            ]
+        ]
+    },
+    {
+        "id": "4ea5dbc7d7e58c55",
+        "type": "function",
+        "z": "c5301cf5736b9aec",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"zadana\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 440,
+        "wires": [
+            [
+                "aa1518a4eeca355f",
+                "8879ab847f93f8bc"
+            ]
+        ]
+    },
+    {
+        "id": "aa1518a4eeca355f",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "6fd116e090c75327",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "8879ab847f93f8bc",
+        "type": "join",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 550,
+        "y": 380,
+        "wires": [
+            [
+                "33702c8b8b34d5f4",
+                "c98af1387c6d2d7d"
+            ]
+        ]
+    },
+    {
+        "id": "928731dd3e9432a4",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "c98af1387c6d2d7d",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "11af17dd12afce45",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "8e6a215b04bda242",
+        "type": "link out",
+        "z": "f6c736a1387dd46d",
+        "name": "do pieca",
+        "links": [
+            "57f07b95c4b9df52",
+            "7778e1603c3a3f64",
+            "f3f2234913e335ab",
+            "8cf6df96f2cc66fe",
+            "4a44b79ce2fd8a07"
+        ],
+        "x": 1235,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "2f66173856c481c6",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "bf56cc425c6cd711",
+        "type": "join",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 630,
+        "y": 740,
+        "wires": [
+            [
+                "5a16270c2dd84dec",
+                "5d092b9f5f94ee9c"
+            ]
+        ]
+    },
+    {
+        "id": "5d092b9f5f94ee9c",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "2c5bdf717864fa70",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "5a16270c2dd84dec",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "compare",
+        "func": "var x = msg.payload.powrot\nvar y = msg.payload.krzywa\nvar val = false;\n\nif (parseFloat(x) < parseFloat(y)){\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 740,
+        "wires": [
+            [
+                "2c5bdf717864fa70",
+                "cfc027457b279dd9"
+            ]
+        ]
+    },
+    {
+        "id": "58b4a0239273c857",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"powrot\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 800,
+        "wires": [
+            [
+                "2f66173856c481c6",
+                "bf56cc425c6cd711"
+            ]
+        ]
+    },
+    {
+        "id": "ab17b3a6b515efa0",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"krzywa\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 680,
+        "wires": [
+            [
+                "bc99dddf85f2ca88",
+                "bf56cc425c6cd711"
+            ]
+        ]
+    },
+    {
+        "id": "bc99dddf85f2ca88",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "f8cfd6bd1cd1abc9",
+        "type": "webthingsio-get-property",
+        "z": "f6c736a1387dd46d",
+        "name": "powrót C.O.",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasBasement",
+        "property": "floor_temp6",
+        "x": 130,
+        "y": 660,
+        "wires": [
+            [
+                "44cfa6493bde0629",
+                "58b4a0239273c857"
+            ]
+        ]
+    },
+    {
+        "id": "eb35ae618fb0a061",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "f8cfd6bd1cd1abc9",
+                "bc55063b4bc04992"
+            ]
+        ]
+    },
+    {
+        "id": "a5f5a08b5bae89d4",
+        "type": "webthingsio-set-property",
+        "z": "f6c736a1387dd46d",
+        "name": "Zadana powrotu c.o.",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a068796d-0900-40ca-8733-493e39007c98",
+        "property": "target",
+        "inputMode": "injected",
+        "x": 1200,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "cfc027457b279dd9",
+        "type": "switch",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1070,
+        "y": 740,
+        "wires": [
+            [
+                "1f94f7c7209d8af7",
+                "8e6a215b04bda242",
+                "f07dfdf7bf2af80f"
+            ]
+        ]
+    },
+    {
+        "id": "1f94f7c7209d8af7",
+        "type": "trigger",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "op1": "true",
+        "op2": "false",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "3",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 890,
+        "y": 940,
+        "wires": [
+            [
+                "cb131f65bec96921",
+                "03f9da7787faad41"
+            ]
+        ]
+    },
+    {
+        "id": "cb131f65bec96921",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "03f9da7787faad41",
+        "type": "change",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "true",
+                "fromt": "bool",
+                "to": "heating",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "false",
+                "fromt": "bool",
+                "to": "off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1150,
+        "y": 1080,
+        "wires": [
+            [
+                "41b39dc05b03b6cb",
+                "e88f0e81c31b6ffb"
+            ]
+        ]
+    },
+    {
+        "id": "41b39dc05b03b6cb",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "e88f0e81c31b6ffb",
+        "type": "webthingsio-set-property",
+        "z": "f6c736a1387dd46d",
+        "name": "heating",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a068796d-0900-40ca-8733-493e39007c98",
+        "property": "heating",
+        "inputMode": "injected",
+        "x": 1160,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "908b25b4553431b9",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "bf699c0fd415c196",
+        "type": "switch",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 990,
+        "y": 380,
+        "wires": [
+            [
+                "908b25b4553431b9",
+                "40eba78f6091e98f",
+                "c951f96482088511"
+            ]
+        ]
+    },
+    {
+        "id": "40eba78f6091e98f",
+        "type": "trigger",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "op1": "true",
+        "op2": "false",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "3",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 830,
+        "y": 740,
+        "wires": [
+            [
+                "be4ba050b71acc55",
+                "5dc0b8c3985d52b1"
+            ]
+        ]
+    },
+    {
+        "id": "be4ba050b71acc55",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "05ccf6861e5e04c6",
+        "type": "webthingsio-set-property",
+        "z": "c5301cf5736b9aec",
+        "name": "heating",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-80403f04-0468-40be-a141-84d7033ee350",
+        "property": "heat",
+        "inputMode": "injected",
+        "x": 1300,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "5dc0b8c3985d52b1",
+        "type": "change",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "true",
+                "fromt": "bool",
+                "to": "heating",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "false",
+                "fromt": "bool",
+                "to": "off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1090,
+        "y": 880,
+        "wires": [
+            [
+                "05ccf6861e5e04c6",
+                "dabb4c135037de52"
+            ]
+        ]
+    },
+    {
+        "id": "dabb4c135037de52",
+        "type": "debug",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "ca3b010d3fbf8040",
+        "type": "trigger",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "op1": "true",
+        "op2": "false",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "3",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 1010,
+        "y": 480,
+        "wires": [
+            [
+                "0b3915b0a444f5f9",
+                "c3cf7ff7a87392a8"
+            ]
+        ]
+    },
+    {
+        "id": "0b3915b0a444f5f9",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1050,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "c3cf7ff7a87392a8",
+        "type": "webthingsio-set-property",
+        "z": "b34b5b20e6a54d6f",
+        "name": "piec gazowy",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.201-things-switch",
+        "property": "on",
+        "inputMode": "injected",
+        "x": 1250,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "c951f96482088511",
+        "type": "link out",
+        "z": "c5301cf5736b9aec",
+        "name": "do pieca c.o.",
+        "links": [
+            "4a44b79ce2fd8a07",
+            "232059b3ff86fdfd"
+        ],
+        "x": 1235,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "4a44b79ce2fd8a07",
+        "type": "link in",
+        "z": "b34b5b20e6a54d6f",
+        "name": "z termostatu",
+        "links": [
+            "5fd16799c62483ed",
+            "8e6a215b04bda242",
+            "c951f96482088511"
+        ],
+        "x": 135,
+        "y": 140,
+        "wires": [
+            [
+                "2211ea2f6d18ff04",
+                "53e17e7f7cb347fc"
+            ]
+        ]
+    },
+    {
+        "id": "2211ea2f6d18ff04",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 330,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "f07dfdf7bf2af80f",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "e9ea0b2e9c26172e",
+        "type": "switch",
+        "z": "c5301cf5736b9aec",
+        "name": "check if number",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "istype",
+                "v": "number",
+                "vt": "number"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 480,
+        "y": 120,
+        "wires": [
+            [
+                "431a5e6844d54f70"
+            ]
+        ]
+    },
+    {
+        "id": "8f6b28c43b13673c",
+        "type": "webthingsio-set-property",
+        "z": "f6c736a1387dd46d",
+        "name": "Krzywa termostat powrót c.o.",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a068796d-0900-40ca-8733-493e39007c98",
+        "property": "real",
+        "inputMode": "injected",
+        "x": 520,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "c471698e3c4da9bb",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "round to 1 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*10)/10\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 80,
+        "wires": [
+            [
+                "a5f5a08b5bae89d4",
+                "95bb47af7538beb9"
+            ]
+        ]
+    },
+    {
+        "id": "95bb47af7538beb9",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "44cfa6493bde0629",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "round to 2 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 980,
+        "wires": [
+            [
+                "505b757bc94c71cf",
+                "8f6b28c43b13673c"
+            ]
+        ]
+    },
+    {
+        "id": "505b757bc94c71cf",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 170,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "743064ef32f4fd9b",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "off",
+        "payloadType": "str",
+        "x": 1150,
+        "y": 900,
+        "wires": [
+            [
+                "e88f0e81c31b6ffb"
+            ]
+        ]
+    },
+    {
+        "id": "431a5e6844d54f70",
+        "type": "function",
+        "z": "c5301cf5736b9aec",
+        "name": "round to 2 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 120,
+        "wires": [
+            [
+                "2cccaa2e01270375",
+                "11af17dd12afce45"
+            ]
+        ]
+    },
+    {
+        "id": "e85bc33b2c5e6bb5",
+        "type": "inject",
+        "z": "b98894ba757de358",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "6",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 480,
+        "wires": [
+            [
+                "953addaa8e2adf1c",
+                "8b7d04e782ae7850",
+                "ac952e0f7fec7cf0",
+                "ae2167dc7fb05393",
+                "94becef25ff006c6"
+            ]
+        ]
+    },
+    {
+        "id": "953addaa8e2adf1c",
+        "type": "webthingsio-get-property",
+        "z": "b98894ba757de358",
+        "name": "Zasilanie podłogówki",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasBasement",
+        "property": "floor_temp3",
+        "x": 160,
+        "y": 560,
+        "wires": [
+            [
+                "200e349368fccea0"
+            ]
+        ]
+    },
+    {
+        "id": "853a189684091ae4",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "compare",
+        "func": "var val = false;\nvar max_water = 40;\nvar max_floor = 35;\nif(\n(parseFloat(msg.payload.zasilanie) < max_water) & \n(parseFloat(msg.payload.powrot) < max_water) &\n(parseFloat(msg.payload.podloga1) < max_floor) &\n(parseFloat(msg.payload.podloga2) < max_floor)\n)\n{\n    val = true;\n}\n\nvar newMsg = {payload: val, topic: \"ponizej_max\"}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 560,
+        "wires": [
+            [
+                "99fb5703b625f430"
+            ]
+        ]
+    },
+    {
+        "id": "d11d00c69017d691",
+        "type": "switch",
+        "z": "b98894ba757de358",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 990,
+        "y": 1060,
+        "wires": [
+            [
+                "66615a1e4896ec28",
+                "7c48d44637dd56fd",
+                "5fd16799c62483ed",
+                "665dbc8ba8208a61"
+            ]
+        ]
+    },
+    {
+        "id": "66615a1e4896ec28",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1210,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "7c48d44637dd56fd",
+        "type": "trigger",
+        "z": "b98894ba757de358",
+        "name": "",
+        "op1": "true",
+        "op2": "false",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "3",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 990,
+        "y": 1380,
+        "wires": [
+            [
+                "35c7c9133c1347c1",
+                "8b1d1556383bf241",
+                "5fd16799c62483ed"
+            ]
+        ]
+    },
+    {
+        "id": "35c7c9133c1347c1",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "8b1d1556383bf241",
+        "type": "webthingsio-set-property",
+        "z": "b98894ba757de358",
+        "name": "Podłogowe",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.184-things-switch",
+        "property": "on",
+        "inputMode": "injected",
+        "x": 1270,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "8b7d04e782ae7850",
+        "type": "webthingsio-get-property",
+        "z": "b98894ba757de358",
+        "name": "Powrót podłogówki",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasBasement",
+        "property": "floor_temp4",
+        "x": 150,
+        "y": 660,
+        "wires": [
+            [
+                "8a7a41af6c357654"
+            ]
+        ]
+    },
+    {
+        "id": "c1a82e43c0e479cd",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "cbe7fab817ec85c1",
+        "type": "join",
+        "z": "b98894ba757de358",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "4",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 710,
+        "y": 560,
+        "wires": [
+            [
+                "24526c8e0ffd2187",
+                "853a189684091ae4"
+            ]
+        ]
+    },
+    {
+        "id": "24526c8e0ffd2187",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 730,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "8a7a41af6c357654",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"powrot\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 660,
+        "wires": [
+            [
+                "c1a82e43c0e479cd",
+                "cbe7fab817ec85c1"
+            ]
+        ]
+    },
+    {
+        "id": "200e349368fccea0",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"zasilanie\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 560,
+        "wires": [
+            [
+                "b1835b95559f8498",
+                "cbe7fab817ec85c1"
+            ]
+        ]
+    },
+    {
+        "id": "b1835b95559f8498",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "ac952e0f7fec7cf0",
+        "type": "webthingsio-get-property",
+        "z": "b98894ba757de358",
+        "name": "Podłoga 1",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasFloor",
+        "property": "floor_temp1",
+        "x": 120,
+        "y": 780,
+        "wires": [
+            [
+                "296f593a06054bd7"
+            ]
+        ]
+    },
+    {
+        "id": "ae2167dc7fb05393",
+        "type": "webthingsio-get-property",
+        "z": "b98894ba757de358",
+        "name": "Podłoga 2",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasFloor",
+        "property": "floor_temp2",
+        "x": 120,
+        "y": 860,
+        "wires": [
+            [
+                "1fe02906810c18e8"
+            ]
+        ]
+    },
+    {
+        "id": "a0ad0b47a3b1f404",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "1fe02906810c18e8",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"podloga2\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 860,
+        "wires": [
+            [
+                "a0ad0b47a3b1f404",
+                "cbe7fab817ec85c1",
+                "2354f5e492c096a5"
+            ]
+        ]
+    },
+    {
+        "id": "296f593a06054bd7",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"podloga1\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 780,
+        "wires": [
+            [
+                "94dc972973a9026c",
+                "cbe7fab817ec85c1",
+                "2354f5e492c096a5"
+            ]
+        ]
+    },
+    {
+        "id": "94dc972973a9026c",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "87f1a4216f7be430",
+        "type": "inject",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "off",
+        "payloadType": "str",
+        "x": 1290,
+        "y": 740,
+        "wires": [
+            [
+                "05ccf6861e5e04c6"
+            ]
+        ]
+    },
+    {
+        "id": "2c14b5af20412507",
+        "type": "link out",
+        "z": "4a573f048a4dd2d3",
+        "name": "sygnał wzbudzający od krzywej grzewczej podłogówki",
+        "links": [
+            "b424a40bb59a0e80"
+        ],
+        "x": 1255,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "a422d15e17e6d39d",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "32fa8aca1ed22950",
+        "type": "join",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 650,
+        "y": 700,
+        "wires": [
+            [
+                "2253e04b6f61fbd1",
+                "96fedaf3681a224b"
+            ]
+        ]
+    },
+    {
+        "id": "96fedaf3681a224b",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "ad090c914c73318e",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "2253e04b6f61fbd1",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "compare",
+        "func": "var x = msg.payload.powrot\nvar y = msg.payload.krzywa\nvar val = false;\n\nif (parseFloat(x) < parseFloat(y)){\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 700,
+        "wires": [
+            [
+                "ad090c914c73318e",
+                "0c8b9be8e6ef0804"
+            ]
+        ]
+    },
+    {
+        "id": "346ebf973b517605",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"powrot\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 760,
+        "wires": [
+            [
+                "a422d15e17e6d39d",
+                "32fa8aca1ed22950"
+            ]
+        ]
+    },
+    {
+        "id": "ee63b8db33eae661",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"krzywa\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 640,
+        "wires": [
+            [
+                "0b6d37475b9227d2",
+                "32fa8aca1ed22950"
+            ]
+        ]
+    },
+    {
+        "id": "0b6d37475b9227d2",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "ef30c12dcb7ca9a6",
+        "type": "webthingsio-get-property",
+        "z": "4a573f048a4dd2d3",
+        "name": "Powrót podłogówki",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasBasement",
+        "property": "floor_temp4",
+        "x": 130,
+        "y": 600,
+        "wires": [
+            [
+                "2dad1cd9aa746692",
+                "346ebf973b517605"
+            ]
+        ]
+    },
+    {
+        "id": "162fad0c350e8572",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 90,
+        "y": 80,
+        "wires": [
+            [
+                "ef30c12dcb7ca9a6",
+                "bf92692bed302d3f"
+            ]
+        ]
+    },
+    {
+        "id": "af492d27bbedd386",
+        "type": "webthingsio-set-property",
+        "z": "4a573f048a4dd2d3",
+        "name": "Zadana podłogi",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674",
+        "property": "target",
+        "inputMode": "injected",
+        "x": 1300,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "0c8b9be8e6ef0804",
+        "type": "switch",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1090,
+        "y": 700,
+        "wires": [
+            [
+                "5923d10c87d76715",
+                "2c14b5af20412507",
+                "5d6eccb2688bbfc1"
+            ]
+        ]
+    },
+    {
+        "id": "5923d10c87d76715",
+        "type": "trigger",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "op1": "true",
+        "op2": "false",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "3",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 930,
+        "y": 1160,
+        "wires": [
+            [
+                "0f90c0079be54df6",
+                "60a0fa8776ad0e36"
+            ]
+        ]
+    },
+    {
+        "id": "0f90c0079be54df6",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "60a0fa8776ad0e36",
+        "type": "change",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "true",
+                "fromt": "bool",
+                "to": "heating",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "false",
+                "fromt": "bool",
+                "to": "off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1190,
+        "y": 1300,
+        "wires": [
+            [
+                "ba122129d14ac7de",
+                "3e892c6e31ec33b0"
+            ]
+        ]
+    },
+    {
+        "id": "ba122129d14ac7de",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1180,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "3e892c6e31ec33b0",
+        "type": "webthingsio-set-property",
+        "z": "4a573f048a4dd2d3",
+        "name": "heating",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674",
+        "property": "heating",
+        "inputMode": "injected",
+        "x": 1200,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "5d6eccb2688bbfc1",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "5d53a6aa53249860",
+        "type": "webthingsio-set-property",
+        "z": "4a573f048a4dd2d3",
+        "name": "Krzywa termostat powrót podłogowe",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674",
+        "property": "real",
+        "inputMode": "injected",
+        "x": 570,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "4b9e76ba86d95305",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "round to 2 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1150,
+        "y": 200,
+        "wires": [
+            [
+                "52656ccb84754ed8",
+                "af492d27bbedd386"
+            ]
+        ]
+    },
+    {
+        "id": "52656ccb84754ed8",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "2dad1cd9aa746692",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "round to 2 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 940,
+        "wires": [
+            [
+                "835c542f9bb8c484",
+                "5d53a6aa53249860"
+            ]
+        ]
+    },
+    {
+        "id": "835c542f9bb8c484",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 190,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "7794c795eff2f682",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "off",
+        "payloadType": "str",
+        "x": 1170,
+        "y": 1100,
+        "wires": [
+            [
+                "3e892c6e31ec33b0"
+            ]
+        ]
+    },
+    {
+        "id": "99fb5703b625f430",
+        "type": "join",
+        "z": "b98894ba757de358",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 570,
+        "y": 1060,
+        "wires": [
+            [
+                "78e39a9319b58485",
+                "736e0a2d44075ede"
+            ]
+        ]
+    },
+    {
+        "id": "78e39a9319b58485",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "b424a40bb59a0e80",
+        "type": "link in",
+        "z": "b98894ba757de358",
+        "name": "sygnał z podłogówki do sprawdzenia",
+        "links": [
+            "2c14b5af20412507"
+        ],
+        "x": 115,
+        "y": 1060,
+        "wires": [
+            [
+                "c2711a6a0b2957f1"
+            ]
+        ]
+    },
+    {
+        "id": "c2711a6a0b2957f1",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"wlacz\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 1060,
+        "wires": [
+            [
+                "882d9c1214d6129a",
+                "99fb5703b625f430"
+            ]
+        ]
+    },
+    {
+        "id": "882d9c1214d6129a",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 190,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "736e0a2d44075ede",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "check",
+        "func": "var val = false;\n\nif (msg.payload.wlacz & msg.payload.ponizej_max)\n    val = true;\n\nvar newMsg = {payload: val}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 1060,
+        "wires": [
+            [
+                "d11d00c69017d691",
+                "cb79ace3afb24899"
+            ]
+        ]
+    },
+    {
+        "id": "5fd16799c62483ed",
+        "type": "link out",
+        "z": "b98894ba757de358",
+        "name": "sygnał z podłogówki dla pieca",
+        "links": [
+            "4a44b79ce2fd8a07"
+        ],
+        "x": 1225,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "eba2fd09666196c3",
+        "type": "spline-curve",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "output_key": "payload",
+        "input_key": "payload",
+        "points": [
+            {
+                "x": 0,
+                "y": 0.44
+            },
+            {
+                "x": 0.3,
+                "y": 0.5
+            },
+            {
+                "x": 0.6,
+                "y": 0.61
+            },
+            {
+                "x": 0.75,
+                "y": 0.65
+            },
+            {
+                "x": 1,
+                "y": 0.67
+            }
+        ],
+        "x": 830,
+        "y": 360,
+        "wires": [
+            [
+                "9f010844cf1d7282",
+                "61f6086019e7302a"
+            ]
+        ]
+    },
+    {
+        "id": "60d4c4b421668876",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "map",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: -(input/40)+0.5}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 360,
+        "wires": [
+            [
+                "d65af0c09e9f05d3",
+                "eba2fd09666196c3"
+            ]
+        ]
+    },
+    {
+        "id": "d65af0c09e9f05d3",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "9f010844cf1d7282",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 850,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "61f6086019e7302a",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "map",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: (input*40)+10}\n\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 360,
+        "wires": [
+            [
+                "0f8129b99956f61b",
+                "4b9e76ba86d95305",
+                "ee63b8db33eae661"
+            ]
+        ]
+    },
+    {
+        "id": "0f8129b99956f61b",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "20d6e20ef0226fa2",
+        "type": "switch",
+        "z": "4a573f048a4dd2d3",
+        "name": "<=17 filter",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "17",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 440,
+        "y": 360,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "bf92692bed302d3f",
+        "type": "webthingsio-get-property",
+        "z": "4a573f048a4dd2d3",
+        "name": "zewnetrzna",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "weather-f4d390665081060b0dfc89ddeddf9441105acb1c",
+        "property": "feelsLike",
+        "x": 270,
+        "y": 360,
+        "wires": [
+            [
+                "20d6e20ef0226fa2",
+                "2f630299f67850c1"
+            ]
+        ]
+    },
+    {
+        "id": "2f630299f67850c1",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 270,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "82f64e0b6475d0d9",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "-10",
+        "payloadType": "str",
+        "x": 450,
+        "y": 220,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "3aed71bfda369fad",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "-20",
+        "payloadType": "str",
+        "x": 450,
+        "y": 260,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "30cf5a35d82f4301",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "-25",
+        "payloadType": "str",
+        "x": 450,
+        "y": 300,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "e871a394327db078",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "str",
+        "x": 930,
+        "y": 240,
+        "wires": [
+            [
+                "61f6086019e7302a"
+            ]
+        ]
+    },
+    {
+        "id": "f96649845297d58d",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "str",
+        "x": 930,
+        "y": 320,
+        "wires": [
+            [
+                "61f6086019e7302a"
+            ]
+        ]
+    },
+    {
+        "id": "d02b956920dca980",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0.5",
+        "payloadType": "str",
+        "x": 930,
+        "y": 280,
+        "wires": [
+            [
+                "61f6086019e7302a"
+            ]
+        ]
+    },
+    {
+        "id": "4a995d7caa65dd06",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "str",
+        "x": 450,
+        "y": 180,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "1570d45fdee7f2f9",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "10",
+        "payloadType": "str",
+        "x": 450,
+        "y": 140,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "6e530b85eea5613c",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "20",
+        "payloadType": "str",
+        "x": 450,
+        "y": 100,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "a732f420980598c6",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "25",
+        "payloadType": "str",
+        "x": 450,
+        "y": 60,
+        "wires": [
+            [
+                "60d4c4b421668876"
+            ]
+        ]
+    },
+    {
+        "id": "f18d43f7a481c444",
+        "type": "spline-curve",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "output_key": "payload",
+        "input_key": "payload",
+        "points": [
+            {
+                "x": 0,
+                "y": 0.2
+            },
+            {
+                "x": 0.3,
+                "y": 0.34
+            },
+            {
+                "x": 0.5,
+                "y": 0.424
+            },
+            {
+                "x": 1,
+                "y": 0.5
+            }
+        ],
+        "x": 850,
+        "y": 340,
+        "wires": [
+            [
+                "3e19a5dc5b118470",
+                "dba705e0195bd88d"
+            ]
+        ]
+    },
+    {
+        "id": "a36fbc703d26ac24",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "map",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: -(input/40)+0.5}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 340,
+        "wires": [
+            [
+                "7847a1d19849b1fe",
+                "f18d43f7a481c444"
+            ]
+        ]
+    },
+    {
+        "id": "7847a1d19849b1fe",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "3e19a5dc5b118470",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "dba705e0195bd88d",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "map",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: (input*40)+10}\n\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 340,
+        "wires": [
+            [
+                "f211319f0f0d248a",
+                "c471698e3c4da9bb",
+                "ab17b3a6b515efa0"
+            ]
+        ]
+    },
+    {
+        "id": "f211319f0f0d248a",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1190,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "d7b53660af63f68f",
+        "type": "switch",
+        "z": "f6c736a1387dd46d",
+        "name": "<=17 filter",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "17",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 460,
+        "y": 340,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "bc55063b4bc04992",
+        "type": "webthingsio-get-property",
+        "z": "f6c736a1387dd46d",
+        "name": "zewnetrzna",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "weather-f4d390665081060b0dfc89ddeddf9441105acb1c",
+        "property": "feelsLike",
+        "x": 290,
+        "y": 340,
+        "wires": [
+            [
+                "d7b53660af63f68f",
+                "31e24770e42531cf"
+            ]
+        ]
+    },
+    {
+        "id": "31e24770e42531cf",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 290,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "1f65b76281ae9d63",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "-10",
+        "payloadType": "str",
+        "x": 470,
+        "y": 200,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "200c3e298950014b",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "-20",
+        "payloadType": "str",
+        "x": 470,
+        "y": 240,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "d76928da30a80793",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "-25",
+        "payloadType": "str",
+        "x": 470,
+        "y": 280,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "eda22fc55265567f",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "str",
+        "x": 950,
+        "y": 220,
+        "wires": [
+            [
+                "dba705e0195bd88d"
+            ]
+        ]
+    },
+    {
+        "id": "13921c97361a93cd",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "str",
+        "x": 950,
+        "y": 300,
+        "wires": [
+            [
+                "dba705e0195bd88d"
+            ]
+        ]
+    },
+    {
+        "id": "2327adb188b53098",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0.5",
+        "payloadType": "str",
+        "x": 950,
+        "y": 260,
+        "wires": [
+            [
+                "dba705e0195bd88d"
+            ]
+        ]
+    },
+    {
+        "id": "6af1703d7cef7da5",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "str",
+        "x": 470,
+        "y": 160,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "b8381b9e5698728b",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "10",
+        "payloadType": "str",
+        "x": 470,
+        "y": 120,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "598514d20e115af3",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "20",
+        "payloadType": "str",
+        "x": 470,
+        "y": 80,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "1f35ed3c795b3c73",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "25",
+        "payloadType": "str",
+        "x": 470,
+        "y": 40,
+        "wires": [
+            [
+                "a36fbc703d26ac24"
+            ]
+        ]
+    },
+    {
+        "id": "cb79ace3afb24899",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "45378c9a0f33e56a",
+        "type": "webthingsio-get-property",
+        "z": "b34b5b20e6a54d6f",
+        "name": "Podłoga 1",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasFloor",
+        "property": "floor_temp1",
+        "x": 220,
+        "y": 460,
+        "wires": [
+            [
+                "e4847999ac15b93e"
+            ]
+        ]
+    },
+    {
+        "id": "17f1f930b5a635c8",
+        "type": "webthingsio-get-property",
+        "z": "b34b5b20e6a54d6f",
+        "name": "Podłoga 2",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasFloor",
+        "property": "floor_temp2",
+        "x": 220,
+        "y": 540,
+        "wires": [
+            [
+                "7531de5794b18619"
+            ]
+        ]
+    },
+    {
+        "id": "a7a3d5c6cb120bb7",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "7531de5794b18619",
+        "type": "function",
+        "z": "b34b5b20e6a54d6f",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"podloga2\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 540,
+        "wires": [
+            [
+                "a7a3d5c6cb120bb7",
+                "291ff33ed60b5545"
+            ]
+        ]
+    },
+    {
+        "id": "e4847999ac15b93e",
+        "type": "function",
+        "z": "b34b5b20e6a54d6f",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"podloga1\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 460,
+        "wires": [
+            [
+                "a5ad14e81b75b7d5",
+                "291ff33ed60b5545"
+            ]
+        ]
+    },
+    {
+        "id": "a5ad14e81b75b7d5",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "841dd0ecfd0264fa",
+        "type": "inject",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "6",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 250,
+        "y": 360,
+        "wires": [
+            [
+                "45378c9a0f33e56a",
+                "17f1f930b5a635c8"
+            ]
+        ]
+    },
+    {
+        "id": "291ff33ed60b5545",
+        "type": "join",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "3",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 690,
+        "y": 260,
+        "wires": [
+            [
+                "785ae51f61701a64",
+                "d7826eb7066dc94f"
+            ]
+        ]
+    },
+    {
+        "id": "785ae51f61701a64",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 710,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "d7826eb7066dc94f",
+        "type": "function",
+        "z": "b34b5b20e6a54d6f",
+        "name": "zabezpiecz podłogę",
+        "func": "var val = false;\nvar max_max_floor = 35;\nif(\n(msg.payload.grzej) & \n(parseFloat(msg.payload.podloga1) < max_max_floor) &\n(parseFloat(msg.payload.podloga2) < max_max_floor)\n)\n{\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 260,
+        "wires": [
+            [
+                "356a223ed7a05f35",
+                "d4d5086e867abe13"
+            ]
+        ]
+    },
+    {
+        "id": "53e17e7f7cb347fc",
+        "type": "function",
+        "z": "b34b5b20e6a54d6f",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"grzej\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 140,
+        "wires": [
+            [
+                "51820460fb02641e",
+                "291ff33ed60b5545"
+            ]
+        ]
+    },
+    {
+        "id": "51820460fb02641e",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 310,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "356a223ed7a05f35",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "d4d5086e867abe13",
+        "type": "switch",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1090,
+        "y": 260,
+        "wires": [
+            [
+                "5749cf7d9589162f",
+                "ca3b010d3fbf8040",
+                "c3cf7ff7a87392a8"
+            ]
+        ]
+    },
+    {
+        "id": "5749cf7d9589162f",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "18303ade58d3856b",
+        "type": "inject",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 200,
+        "wires": [
+            [
+                "4ab5f024937c22ab"
+            ]
+        ]
+    },
+    {
+        "id": "4ab5f024937c22ab",
+        "type": "http request",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api.syngeos.pl/api/public/widget.html?deviceId=1126&sensorsList[]=pm10&template=horizontal&theme=dark",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "authType": "",
+        "x": 250,
+        "y": 280,
+        "wires": [
+            [
+                "faab8e2e6bd88422",
+                "e9e254f0e5e91f2c"
+            ]
+        ]
+    },
+    {
+        "id": "40ee668a6dda3267",
+        "type": "debug",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "faab8e2e6bd88422",
+        "type": "function",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "func": "const regex = /\\d*\\.?\\d*(?= µg\\/m³)/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseFloat(m).toString()};\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 400,
+        "wires": [
+            [
+                "40ee668a6dda3267",
+                "c5ab8e3d8b9177e9"
+            ]
+        ]
+    },
+    {
+        "id": "410748a3dfee8cb1",
+        "type": "webthingsio-set-property",
+        "z": "fba4eb03b808932c",
+        "name": "pm10 gęstość",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-e98369aa-4f40-4ecd-b905-4a26a7e639ba",
+        "property": "pm10density",
+        "inputMode": "injected",
+        "x": 700,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "332e0c5965c5e196",
+        "type": "debug",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "e9e254f0e5e91f2c",
+        "type": "function",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "func": "const regex = /(?<=<p class=\"widget-body__value\">)\\d*/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseInt(m)};\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 520,
+        "wires": [
+            [
+                "332e0c5965c5e196",
+                "e7e1f4dfe16e0c3e"
+            ]
+        ]
+    },
+    {
+        "id": "e7e1f4dfe16e0c3e",
+        "type": "webthingsio-set-property",
+        "z": "fba4eb03b808932c",
+        "name": "pm10 procent",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-e98369aa-4f40-4ecd-b905-4a26a7e639ba",
+        "property": "pm10percentage",
+        "inputMode": "injected",
+        "x": 700,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "c5ab8e3d8b9177e9",
+        "type": "function",
+        "z": "fba4eb03b808932c",
+        "name": "round to 2 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 280,
+        "wires": [
+            [
+                "db2655a891c5d994",
+                "410748a3dfee8cb1"
+            ]
+        ]
+    },
+    {
+        "id": "db2655a891c5d994",
+        "type": "debug",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "cbdba19843b80737",
+        "type": "catch",
+        "z": "b98894ba757de358",
+        "name": "",
+        "scope": null,
+        "uncaught": false,
+        "x": 140,
+        "y": 1340,
+        "wires": [
+            [
+                "8e258ecc994fcfc6"
+            ]
+        ]
+    },
+    {
+        "id": "8e258ecc994fcfc6",
+        "type": "change",
+        "z": "b98894ba757de358",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "false",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "error",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 320,
+        "y": 1340,
+        "wires": [
+            [
+                "8b1d1556383bf241",
+                "f9de74ce876ed165"
+            ]
+        ]
+    },
+    {
+        "id": "f3d5abbe17e23b76",
+        "type": "catch",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "scope": [
+            "45378c9a0f33e56a",
+            "17f1f930b5a635c8"
+        ],
+        "uncaught": false,
+        "x": 190,
+        "y": 720,
+        "wires": [
+            [
+                "8fffb3958688949d"
+            ]
+        ]
+    },
+    {
+        "id": "8fffb3958688949d",
+        "type": "change",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "false",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "error",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 720,
+        "wires": [
+            [
+                "c3cf7ff7a87392a8",
+                "b7ed7eb0cfbcc74d"
+            ]
+        ]
+    },
+    {
+        "id": "b7ed7eb0cfbcc74d",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "f9de74ce876ed165",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 310,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "d0d5971f8aedeaae",
+        "type": "mqtt in",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "topic": "#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "4a220e7de4c66cea",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 250,
+        "y": 580,
+        "wires": [
+            [
+                "a23348405d377208"
+            ]
+        ]
+    },
+    {
+        "id": "a23348405d377208",
+        "type": "debug",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "5a3a7395e3c73a58",
+        "type": "debug",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "79143db6331d7082",
+        "type": "mqtt out",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "topic": "roomtemp",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "4a220e7de4c66cea",
+        "x": 1120,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "5f10c9cfcc8684cb",
+        "type": "inject",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "f1",
+        "payloadType": "date",
+        "x": 160,
+        "y": 420,
+        "wires": [
+            [
+                "9c8d7c8f4bbd217f",
+                "9b644188a817b0bb",
+                "26f5abf20e25a6bb"
+            ]
+        ]
+    },
+    {
+        "id": "94becef25ff006c6",
+        "type": "webthingsio-get-property",
+        "z": "b98894ba757de358",
+        "name": "Powrót C.O.",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-dallasBasement",
+        "property": "floor_temp6",
+        "x": 130,
+        "y": 1220,
+        "wires": [
+            [
+                "db602fd7bcd8d072"
+            ]
+        ]
+    },
+    {
+        "id": "2354f5e492c096a5",
+        "type": "join",
+        "z": "b98894ba757de358",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "3",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 510,
+        "y": 1220,
+        "wires": [
+            [
+                "1e0cf06f38fae937",
+                "c5491d7a636044a5"
+            ]
+        ]
+    },
+    {
+        "id": "1e0cf06f38fae937",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "czy piec grzeje",
+        "func": "var val = true;\nif(\n(parseFloat(msg.payload.podloga1) > \nparseFloat(msg.payload.powrotco)) ||\n(parseFloat(msg.payload.podloga2) > \nparseFloat(msg.payload.powrotco))\n)\n{\n    val = false;\n}\nvar newMsg = {payload: val}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 1220,
+        "wires": [
+            [
+                "fa4d406727f81295",
+                "d895378edd4e260d"
+            ]
+        ]
+    },
+    {
+        "id": "c5491d7a636044a5",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "fa4d406727f81295",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "db602fd7bcd8d072",
+        "type": "function",
+        "z": "b98894ba757de358",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"powrotco\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 1220,
+        "wires": [
+            [
+                "53c235edeaf98b74",
+                "2354f5e492c096a5"
+            ]
+        ]
+    },
+    {
+        "id": "53c235edeaf98b74",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 310,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "d895378edd4e260d",
+        "type": "switch",
+        "z": "b98894ba757de358",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "false",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 890,
+        "y": 1220,
+        "wires": [
+            [
+                "8b1d1556383bf241",
+                "a172b547f6a036ff"
+            ]
+        ]
+    },
+    {
+        "id": "a172b547f6a036ff",
+        "type": "debug",
+        "z": "b98894ba757de358",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "58e8155972293301",
+        "type": "comment",
+        "z": "b98894ba757de358",
+        "name": "Uwaga!!",
+        "info": "Zasilanie podłogówki musi być z powrotu CO.\nTemperatura powrotu CO jest sprawdzana!!\nMusi być wyższa niż temperatura podłogi.",
+        "x": 700,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "665dbc8ba8208a61",
+        "type": "delay",
+        "z": "b98894ba757de358",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "x": 1200,
+        "y": 1120,
+        "wires": [
+            [
+                "8b1d1556383bf241"
+            ]
+        ]
+    },
+    {
+        "id": "d92fb2e09c67bd43",
+        "type": "mqtt out",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "topic": "zadanapodlogowego",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "4a220e7de4c66cea",
+        "x": 1160,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "14ad2837a3ce422b",
+        "type": "mqtt out",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "topic": "rzeczywistapodlogowego",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "4a220e7de4c66cea",
+        "x": 1170,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "9c8d7c8f4bbd217f",
+        "type": "webthingsio-get-property",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674",
+        "property": "real",
+        "x": 710,
+        "y": 500,
+        "wires": [
+            [
+                "14ad2837a3ce422b"
+            ]
+        ]
+    },
+    {
+        "id": "9b644188a817b0bb",
+        "type": "webthingsio-get-property",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674",
+        "property": "target",
+        "x": 720,
+        "y": 460,
+        "wires": [
+            [
+                "d92fb2e09c67bd43"
+            ]
+        ]
+    },
+    {
+        "id": "26f5abf20e25a6bb",
+        "type": "webthingsio-get-property",
+        "z": "bcee1bd9591a9655",
+        "name": "",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-bmp280",
+        "property": "room_temp",
+        "x": 650,
+        "y": 420,
+        "wires": [
+            [
+                "79143db6331d7082",
+                "5a3a7395e3c73a58"
+            ]
+        ]
+    },
+    {
+        "id": "f7725916b6141ffe",
+        "type": "inject",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0",
+        "topic": "",
+        "payload": "false",
+        "payloadType": "str",
+        "x": 960,
+        "y": 700,
+        "wires": [
+            [
+                "c3cf7ff7a87392a8"
+            ]
+        ]
+    },
+    {
+        "id": "bb5d2e2fb333ec44",
+        "type": "inject",
+        "z": "b98894ba757de358",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0",
+        "topic": "",
+        "payload": "false",
+        "payloadType": "str",
+        "x": 130,
+        "y": 1480,
+        "wires": [
+            [
+                "8b1d1556383bf241"
+            ]
+        ]
+    },
+    {
+        "id": "160c1046aa6a8623",
+        "type": "inject",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0",
+        "topic": "",
+        "payload": "off",
+        "payloadType": "str",
+        "x": 1170,
+        "y": 1140,
+        "wires": [
+            [
+                "3e892c6e31ec33b0"
+            ]
+        ]
+    },
+    {
+        "id": "fd96803ac69522a4",
+        "type": "inject",
+        "z": "c5301cf5736b9aec",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0",
+        "topic": "",
+        "payload": "false",
+        "payloadType": "str",
+        "x": 1290,
+        "y": 780,
+        "wires": [
+            [
+                "05ccf6861e5e04c6"
+            ]
+        ]
+    },
+    {
+        "id": "9297d505f66d7546",
+        "type": "inject",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0",
+        "topic": "",
+        "payload": "off",
+        "payloadType": "str",
+        "x": 1150,
+        "y": 940,
+        "wires": [
+            [
+                "e88f0e81c31b6ffb"
+            ]
+        ]
+    }
+]
