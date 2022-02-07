@@ -2,7 +2,10 @@
     "name": "nodered",
     "description": "Node-RED files for home raspberry ",
     "version": "0.0.1",
-    "dependencies": {},
+    "dependencies": {
+        "node-red-contrib-spline-curve": "1.1.8",
+        "node-red-contrib-webthingsio": "0.2.3"
+    },
     "node-red": {
         "settings": {
             "flowFile": "flows_ubuntu.json",
