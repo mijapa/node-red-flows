@@ -91,6 +91,12 @@
         "sessionExpiry": ""
     },
     {
+        "id": "510a1c0176e7e0fd",
+        "type": "chronos-config",
+        "name": "",
+        "sunPositions": []
+    },
+    {
         "id": "5d87b9f621a97cd0",
         "type": "inject",
         "z": "2641e2d8a125e03d",
@@ -1904,8 +1910,8 @@
         "thing": "virtual-things-custom-a2aed172-2b01-4567-9cf4-027346f71674",
         "property": "target",
         "inputMode": "injected",
-        "x": 1300,
-        "y": 80,
+        "x": 1800,
+        "y": 100,
         "wires": []
     },
     {
@@ -2088,8 +2094,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 200,
+        "x": 1650,
+        "y": 220,
         "wires": [
             [
                 "52656ccb84754ed8",
@@ -2110,8 +2116,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1090,
-        "y": 80,
+        "x": 1590,
+        "y": 100,
         "wires": []
     },
     {
@@ -2341,7 +2347,7 @@
         "wires": [
             [
                 "9f010844cf1d7282",
-                "61f6086019e7302a"
+                "e46114b4a0d45d59"
             ]
         ]
     },
@@ -2409,8 +2415,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1110,
-        "y": 360,
+        "x": 1610,
+        "y": 380,
         "wires": [
             [
                 "0f8129b99956f61b",
@@ -2432,8 +2438,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1170,
-        "y": 320,
+        "x": 1670,
+        "y": 340,
         "wires": []
     },
     {
@@ -2586,8 +2592,8 @@
         "topic": "",
         "payload": "1",
         "payloadType": "str",
-        "x": 930,
-        "y": 240,
+        "x": 1430,
+        "y": 260,
         "wires": [
             [
                 "61f6086019e7302a"
@@ -2611,8 +2617,8 @@
         "topic": "",
         "payload": "0",
         "payloadType": "str",
-        "x": 930,
-        "y": 320,
+        "x": 1430,
+        "y": 340,
         "wires": [
             [
                 "61f6086019e7302a"
@@ -2636,8 +2642,8 @@
         "topic": "",
         "payload": "0.5",
         "payloadType": "str",
-        "x": 930,
-        "y": 280,
+        "x": 1430,
+        "y": 300,
         "wires": [
             [
                 "61f6086019e7302a"
@@ -4334,6 +4340,70 @@
         "wires": [
             [
                 "e88f0e81c31b6ffb"
+            ]
+        ]
+    },
+    {
+        "id": "e46114b4a0d45d59",
+        "type": "chronos-switch",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "config": "510a1c0176e7e0fd",
+        "baseTime": "",
+        "baseTimeType": "msgIngress",
+        "conditions": [
+            {
+                "operator": "between",
+                "label": "between 06:00 and 15:00",
+                "operands": [
+                    {
+                        "type": "time",
+                        "value": "06:00",
+                        "offset": 0,
+                        "random": false
+                    },
+                    {
+                        "type": "time",
+                        "value": "15:00",
+                        "offset": 0,
+                        "random": false
+                    }
+                ]
+            },
+            {
+                "operator": "otherwise",
+                "label": "otherwise"
+            }
+        ],
+        "stopOnFirstMatch": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 360,
+        "wires": [
+            [
+                "ae5c4c255e683195"
+            ],
+            [
+                "61f6086019e7302a"
+            ]
+        ]
+    },
+    {
+        "id": "ae5c4c255e683195",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "multiply",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*1.1}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1220,
+        "y": 340,
+        "wires": [
+            [
+                "61f6086019e7302a"
             ]
         ]
     }
