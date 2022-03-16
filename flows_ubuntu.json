@@ -2327,11 +2327,11 @@
             },
             {
                 "x": 0.3,
-                "y": 0.5
+                "y": 0.46
             },
             {
                 "x": 0.6,
-                "y": 0.61
+                "y": 0.58
             },
             {
                 "x": 0.75,
@@ -2393,7 +2393,7 @@
         "type": "debug",
         "z": "4a573f048a4dd2d3",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -3690,9 +3690,16 @@
         "type": "catch",
         "z": "b98894ba757de358",
         "name": "",
-        "scope": null,
+        "scope": [
+            "8b1d1556383bf241",
+            "8b7d04e782ae7850",
+            "94becef25ff006c6",
+            "953addaa8e2adf1c",
+            "ac952e0f7fec7cf0",
+            "ae2167dc7fb05393"
+        ],
         "uncaught": false,
-        "x": 140,
+        "x": 130,
         "y": 1340,
         "wires": [
             [
@@ -3742,7 +3749,8 @@
         "name": "",
         "scope": [
             "45378c9a0f33e56a",
-            "17f1f930b5a635c8"
+            "17f1f930b5a635c8",
+            "c3cf7ff7a87392a8"
         ],
         "uncaught": false,
         "x": 190,
@@ -4354,17 +4362,17 @@
         "conditions": [
             {
                 "operator": "between",
-                "label": "between 06:00 and 15:00",
+                "label": "between 04:00 and 14:00",
                 "operands": [
                     {
                         "type": "time",
-                        "value": "06:00",
+                        "value": "04:00",
                         "offset": 0,
                         "random": false
                     },
                     {
                         "type": "time",
-                        "value": "15:00",
+                        "value": "14:00",
                         "offset": 0,
                         "random": false
                     }
