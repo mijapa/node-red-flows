@@ -56,6 +56,13 @@
         "info": ""
     },
     {
+        "id": "76eb8e87a35baef2",
+        "type": "tab",
+        "label": "Gatekeeper",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "78e0f45783bb3ba6",
         "type": "webthingsio-gateway",
         "name": "Gateway",
@@ -1410,7 +1417,7 @@
         "z": "b98894ba757de358",
         "name": "Podłogowe",
         "gateway": "78e0f45783bb3ba6",
-        "thing": "http---192.168.10.184-things-switch",
+        "thing": "http---sonoff.local-things-switch",
         "property": "on",
         "inputMode": "injected",
         "x": 1270,
@@ -2323,11 +2330,11 @@
         "points": [
             {
                 "x": 0,
-                "y": 0.44
+                "y": 0.41
             },
             {
                 "x": 0.3,
-                "y": 0.46
+                "y": 0.43
             },
             {
                 "x": 0.6,
@@ -3515,7 +3522,7 @@
         "repeat": "60",
         "crontab": "",
         "once": true,
-        "onceDelay": 0.1,
+        "onceDelay": "1",
         "topic": "",
         "payloadType": "date",
         "x": 210,
@@ -3536,7 +3543,7 @@
         "paytoqs": "ignore",
         "url": "https://api.syngeos.pl/api/public/widget.html?deviceId=1126&sensorsList[]=pm10&template=horizontal&theme=dark",
         "tls": "",
-        "persist": true,
+        "persist": false,
         "proxy": "",
         "authType": "",
         "x": 250,
@@ -4414,5 +4421,122 @@
                 "61f6086019e7302a"
             ]
         ]
+    },
+    {
+        "id": "f7e3bf08ee11e7d3",
+        "type": "inject",
+        "z": "76eb8e87a35baef2",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 140,
+        "wires": [
+            [
+                "b3c72bf5f06641b3"
+            ]
+        ]
+    },
+    {
+        "id": "b3c72bf5f06641b3",
+        "type": "webthingsio-get-property",
+        "z": "76eb8e87a35baef2",
+        "name": "",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---esp32-gatekeeper.local-things-switch",
+        "property": "on",
+        "x": 610,
+        "y": 140,
+        "wires": [
+            [
+                "fbed1daea22f921f",
+                "4635f0ddfc0f88b4"
+            ]
+        ]
+    },
+    {
+        "id": "fbed1daea22f921f",
+        "type": "switch",
+        "z": "76eb8e87a35baef2",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 440,
+        "y": 320,
+        "wires": [
+            [
+                "11b8dfc5d40805ad",
+                "053d42beb8282e83"
+            ]
+        ]
+    },
+    {
+        "id": "11b8dfc5d40805ad",
+        "type": "webthingsio-set-property",
+        "z": "76eb8e87a35baef2",
+        "name": "",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---esp32-gatekeeper.local-things-switch",
+        "property": "on",
+        "inputMode": "fixed",
+        "input": false,
+        "x": 830,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "4635f0ddfc0f88b4",
+        "type": "debug",
+        "z": "76eb8e87a35baef2",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "053d42beb8282e83",
+        "type": "debug",
+        "z": "76eb8e87a35baef2",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 420,
+        "wires": []
     }
 ]
