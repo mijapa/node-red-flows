@@ -3345,7 +3345,8 @@
         "wires": [
             [
                 "45378c9a0f33e56a",
-                "17f1f930b5a635c8"
+                "17f1f930b5a635c8",
+                "c153502fb2bb685b"
             ]
         ]
     },
@@ -3363,7 +3364,7 @@
         "joinerType": "str",
         "accumulate": false,
         "timeout": "",
-        "count": "3",
+        "count": "4",
         "reduceRight": false,
         "reduceExp": "",
         "reduceInit": "",
@@ -3400,7 +3401,7 @@
         "type": "function",
         "z": "b34b5b20e6a54d6f",
         "name": "zabezpiecz podłogę",
-        "func": "var val = false;\nvar max_max_floor = 35;\nif(\n(msg.payload.grzej) & \n(parseFloat(msg.payload.podloga1) < max_max_floor) &\n(parseFloat(msg.payload.podloga2) < max_max_floor)\n)\n{\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;",
+        "func": "var val = false;\n\nvar max_max_floor = 35;\nvar max_temp_pokoj = 21.5;\n\nif(\n(msg.payload.grzej) & \n(parseFloat(msg.payload.podloga1) < max_max_floor) &\n(parseFloat(msg.payload.podloga2) < max_max_floor) &\n(parseFloat(msg.payload.temp_pokoj) < max_temp_pokoj)\n)\n{\n    val = true;\n}\n\nvar newMsg = {payload: val}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -3768,8 +3769,8 @@
             "c3cf7ff7a87392a8"
         ],
         "uncaught": false,
-        "x": 190,
-        "y": 720,
+        "x": 210,
+        "y": 920,
         "wires": [
             [
                 "8fffb3958688949d"
@@ -3802,8 +3803,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 380,
-        "y": 720,
+        "x": 400,
+        "y": 920,
         "wires": [
             [
                 "c3cf7ff7a87392a8",
@@ -3823,8 +3824,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 400,
-        "y": 780,
+        "x": 420,
+        "y": 980,
         "wires": []
     },
     {
@@ -4546,5 +4547,58 @@
         "x": 630,
         "y": 420,
         "wires": []
+    },
+    {
+        "id": "c153502fb2bb685b",
+        "type": "webthingsio-get-property",
+        "z": "b34b5b20e6a54d6f",
+        "name": "Temperatura w pokoju",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "http---192.168.10.202-things-bmp280",
+        "property": "room_temp",
+        "x": 260,
+        "y": 620,
+        "wires": [
+            [
+                "46128b6f4054a82f"
+            ]
+        ]
+    },
+    {
+        "id": "6fc31718ab9846e3",
+        "type": "debug",
+        "z": "b34b5b20e6a54d6f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "46128b6f4054a82f",
+        "type": "function",
+        "z": "b34b5b20e6a54d6f",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"temp_pokoj\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 620,
+        "wires": [
+            [
+                "6fc31718ab9846e3",
+                "291ff33ed60b5545"
+            ]
+        ]
     }
 ]
