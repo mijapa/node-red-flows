@@ -63,6 +63,13 @@
         "info": ""
     },
     {
+        "id": "c70ee3db937727a9",
+        "type": "tab",
+        "label": "Tuya",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "78e0f45783bb3ba6",
         "type": "webthingsio-gateway",
         "name": "Gateway",
@@ -4674,6 +4681,341 @@
         "statusType": "auto",
         "x": 1070,
         "y": 400,
+        "wires": []
+    },
+    {
+        "id": "a12e99df600832e4",
+        "type": "http request",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.syngeos.pl/api/public/data/device/1126",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 340,
+        "y": 660,
+        "wires": [
+            [
+                "aaf66c6a6c20fd89"
+            ]
+        ]
+    },
+    {
+        "id": "6a8318e1e1649863",
+        "type": "inject",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 600,
+        "wires": [
+            [
+                "a12e99df600832e4"
+            ]
+        ]
+    },
+    {
+        "id": "bf35c0fd89cf3b8a",
+        "type": "debug",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "b0b55fa6164c80e4",
+        "type": "function",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "func": "pm10percentage = msg.payload.sensors[4].data[0].threshold_level;\nvar newMsg = { payload: parseFloat(pm10percentage).toString()};\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 940,
+        "wires": [
+            [
+                "bf35c0fd89cf3b8a"
+            ]
+        ]
+    },
+    {
+        "id": "aaf66c6a6c20fd89",
+        "type": "json",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 330,
+        "y": 940,
+        "wires": [
+            [
+                "b0b55fa6164c80e4",
+                "7ed86e7f602677b7"
+            ]
+        ]
+    },
+    {
+        "id": "7ed86e7f602677b7",
+        "type": "debug",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "cf4720c520c82131",
+        "type": "tuya-smart-device",
+        "z": "c70ee3db937727a9",
+        "deviceName": "Bulb",
+        "disableAutoStart": false,
+        "deviceId": "",
+        "deviceKey": "",
+        "storeAsCreds": true,
+        "deviceIp": "",
+        "retryTimeout": 1000,
+        "findTimeout": 10000,
+        "tuyaVersion": "3.1",
+        "eventMode": "event-both",
+        "x": 650,
+        "y": 260,
+        "wires": [
+            [
+                "66122ef7996ad49d"
+            ],
+            [
+                "c7d2bcf21b06cece"
+            ]
+        ]
+    },
+    {
+        "id": "66122ef7996ad49d",
+        "type": "debug",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c7d2bcf21b06cece",
+        "type": "debug",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "8fc57b7ab4816953",
+        "type": "function",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "func": "msg.payload ={\n   //dps : 1,\n   dps: 20,\n    set : msg.payload\n}\n\n/*\n\n    */\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 400,
+        "y": 240,
+        "wires": [
+            [
+                "cf4720c520c82131"
+            ]
+        ]
+    },
+    {
+        "id": "4c53116b6db1fde5",
+        "type": "inject",
+        "z": "c70ee3db937727a9",
+        "name": "Turn On",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 200,
+        "y": 200,
+        "wires": [
+            [
+                "8fc57b7ab4816953"
+            ]
+        ]
+    },
+    {
+        "id": "7cc3b1cc600a8139",
+        "type": "inject",
+        "z": "c70ee3db937727a9",
+        "name": "Turn Off",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 200,
+        "y": 280,
+        "wires": [
+            [
+                "8fc57b7ab4816953"
+            ]
+        ]
+    },
+    {
+        "id": "48bbd55ab0e9bafe",
+        "type": "catch",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "scope": null,
+        "uncaught": false,
+        "x": 600,
+        "y": 100,
+        "wires": [
+            [
+                "e14e62fbf546e8e1"
+            ]
+        ]
+    },
+    {
+        "id": "e14e62fbf546e8e1",
+        "type": "debug",
+        "z": "c70ee3db937727a9",
+        "name": "On Error",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "6b98df0ab14c43cf",
+        "type": "inject",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "props": [
+            {
+                "p": "payload.multiple",
+                "v": "true",
+                "vt": "bool"
+            },
+            {
+                "p": "payload.data.20",
+                "v": "true",
+                "vt": "bool"
+            },
+            {
+                "p": "payload.data.21",
+                "v": "white",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 180,
+        "y": 400,
+        "wires": [
+            [
+                "cf4720c520c82131",
+                "4b6cf0c469a2c2ee"
+            ]
+        ]
+    },
+    {
+        "id": "4b6cf0c469a2c2ee",
+        "type": "debug",
+        "z": "c70ee3db937727a9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 420,
+        "y": 420,
         "wires": []
     }
 ]
