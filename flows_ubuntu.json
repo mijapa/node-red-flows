@@ -1417,7 +1417,7 @@
         "z": "b98894ba757de358",
         "name": "Podłogowe",
         "gateway": "78e0f45783bb3ba6",
-        "thing": "http---sonoff.local-things-switch",
+        "thing": "http---192.168.10.184-things-switch",
         "property": "on",
         "inputMode": "injected",
         "x": 1270,
@@ -2330,15 +2330,19 @@
         "points": [
             {
                 "x": 0,
-                "y": 0.32
+                "y": 0.2
+            },
+            {
+                "x": 0.15,
+                "y": 0.26
             },
             {
                 "x": 0.25,
-                "y": 0.39
+                "y": 0.31
             },
             {
                 "x": 0.3,
-                "y": 0.43
+                "y": 0.37
             },
             {
                 "x": 0.6,
@@ -2362,7 +2366,7 @@
         "wires": [
             [
                 "9f010844cf1d7282",
-                "e46114b4a0d45d59"
+                "9707344c5d1e4a98"
             ]
         ]
     },
@@ -2430,8 +2434,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1610,
-        "y": 380,
+        "x": 1690,
+        "y": 440,
         "wires": [
             [
                 "0f8129b99956f61b",
@@ -2445,7 +2449,7 @@
         "type": "debug",
         "z": "4a573f048a4dd2d3",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -2453,21 +2457,21 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1670,
-        "y": 340,
+        "x": 1750,
+        "y": 380,
         "wires": []
     },
     {
         "id": "20d6e20ef0226fa2",
         "type": "switch",
         "z": "4a573f048a4dd2d3",
-        "name": "<=17 filter",
+        "name": "<=18 filter",
         "property": "payload",
         "propertyType": "msg",
         "rules": [
             {
                 "t": "lte",
-                "v": "17",
+                "v": "18",
                 "vt": "str"
             }
         ],
@@ -2863,7 +2867,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1130,
+        "x": 1310,
         "y": 340,
         "wires": [
             [
@@ -2886,7 +2890,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1190,
+        "x": 1370,
         "y": 300,
         "wires": []
     },
@@ -2894,13 +2898,13 @@
         "id": "d7b53660af63f68f",
         "type": "switch",
         "z": "f6c736a1387dd46d",
-        "name": "<=17 filter",
+        "name": "<=18 filter",
         "property": "payload",
         "propertyType": "msg",
         "rules": [
             {
                 "t": "lte",
-                "v": "17",
+                "v": "18",
                 "vt": "str"
             }
         ],
@@ -3040,8 +3044,8 @@
         "topic": "",
         "payload": "1",
         "payloadType": "str",
-        "x": 950,
-        "y": 220,
+        "x": 1130,
+        "y": 200,
         "wires": [
             [
                 "dba705e0195bd88d"
@@ -3065,8 +3069,8 @@
         "topic": "",
         "payload": "0",
         "payloadType": "str",
-        "x": 950,
-        "y": 300,
+        "x": 1130,
+        "y": 280,
         "wires": [
             [
                 "dba705e0195bd88d"
@@ -3090,8 +3094,8 @@
         "topic": "",
         "payload": "0.5",
         "payloadType": "str",
-        "x": 950,
-        "y": 260,
+        "x": 1130,
+        "y": 240,
         "wires": [
             [
                 "dba705e0195bd88d"
@@ -4401,8 +4405,8 @@
         ],
         "stopOnFirstMatch": false,
         "outputs": 2,
-        "x": 1030,
-        "y": 360,
+        "x": 1250,
+        "y": 440,
         "wires": [
             [
                 "ae5c4c255e683195"
@@ -4416,15 +4420,15 @@
         "id": "ae5c4c255e683195",
         "type": "function",
         "z": "4a573f048a4dd2d3",
-        "name": "multiply",
+        "name": "daytime multiply",
         "func": "var input = msg.payload\n\nvar newMsg = {payload: input*1.1}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
-        "y": 340,
+        "x": 1440,
+        "y": 400,
         "wires": [
             [
                 "61f6086019e7302a"
@@ -4600,5 +4604,76 @@
                 "291ff33ed60b5545"
             ]
         ]
+    },
+    {
+        "id": "9707344c5d1e4a98",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "adjust multiply",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*0.85}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 360,
+        "wires": [
+            [
+                "e46114b4a0d45d59",
+                "f304e5ccf1039231"
+            ]
+        ]
+    },
+    {
+        "id": "f304e5ccf1039231",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1130,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "69fbb85755a60498",
+        "type": "function",
+        "z": "f6c736a1387dd46d",
+        "name": "adjust multiply",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*0.8}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 340,
+        "wires": [
+            [
+                "b14808b159e94e37"
+            ]
+        ]
+    },
+    {
+        "id": "b14808b159e94e37",
+        "type": "debug",
+        "z": "f6c736a1387dd46d",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 400,
+        "wires": []
     }
 ]
