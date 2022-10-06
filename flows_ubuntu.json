@@ -77,6 +77,76 @@
         "info": ""
     },
     {
+        "id": "29e4e66030293303",
+        "type": "tab",
+        "label": "Flow 3",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "4e2e7185d786b457",
+        "type": "tab",
+        "label": "Flow 4",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "0175d1e0e4f682ab",
+        "type": "tab",
+        "label": "Flow 5",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "935dc9047937d26b",
+        "type": "tab",
+        "label": "Flow 6",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "f369c5984686a6c3",
+        "type": "tab",
+        "label": "Flow 7",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "ff5f336b722beccb",
+        "type": "tab",
+        "label": "Flow 8",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "5290016a9f3d8bd2",
+        "type": "tab",
+        "label": "Flow 9",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "77d79219714d726f",
+        "type": "tab",
+        "label": "Flow 10",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8a81108efb154f9d",
+        "type": "tab",
+        "label": "Flow 11",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8b8a8b0bd11df203",
+        "type": "tab",
+        "label": "Flow 12",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "78e0f45783bb3ba6",
         "type": "webthingsio-gateway",
         "name": "Gateway",
@@ -1155,8 +1225,8 @@
         "id": "c471698e3c4da9bb",
         "type": "function",
         "z": "f6c736a1387dd46d",
-        "name": "round to 1 decimal place",
-        "func": "var number = msg.payload\nvar rounded = Math.round(number*10)/10\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "name": "round to 2 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2145,8 +2215,8 @@
         "id": "2dad1cd9aa746692",
         "type": "function",
         "z": "4a573f048a4dd2d3",
-        "name": "round to 2 decimal place",
-        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "name": "round to 1 decimal place",
+        "func": "var number = msg.payload\nvar rounded = Math.round(number*10)/10\nvar newMsg = {payload: rounded}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -4922,7 +4992,7 @@
         "proxy": "",
         "authType": "",
         "x": 370,
-        "y": 220,
+        "y": 300,
         "wires": [
             [
                 "30dbac3192ddae4e"
@@ -4946,12 +5016,11 @@
         "repeat": "",
         "crontab": "",
         "once": false,
-        "onceDelay": 0.1,
+        "onceDelay": "30",
         "topic": "",
-        "payload": "",
         "payloadType": "date",
         "x": 180,
-        "y": 220,
+        "y": 300,
         "wires": [
             [
                 "b0dfc0033202611e"
@@ -4971,7 +5040,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 750,
-        "y": 140,
+        "y": 220,
         "wires": []
     },
     {
@@ -4979,14 +5048,14 @@
         "type": "function",
         "z": "03f2afeb9c6195e8",
         "name": "PM10 level to hsv color",
-        "func": "pm10currentNorm = msg.payload.sensors[4].data[0].current_norm;\n\n// https://pypi.org/project/tinytuya/\n// Version 3.3 - Light Type (RGB)\n// DP ID \tFunction Point \tType \tRange \tUnits\n// 24 \tColor \thexstring \th:0-360,s:0-1000,v:0-1000 \thsv \n// color is dps 24 in format \"0[hhh]0[sss]0[vvv]\" where vvv is like brightness and is in range 0-1000\n\n\nswitch (pm10currentNorm){\n    case \"grade-a\": color = \"007803E803E8\"; break;\n    case \"grade-b\": color = \"004E03E803E8\"; break;\n    case \"grade-c\": color = \"003703E803E8\"; break;\n    case \"grade-d\": color = \"002D03E803E8\"; break;\n    case \"grade-e\": color = \"001C03E803E8\"; break;\n    case \"grade-f\": color = \"000003E803E8\"; break;\n\n}\n\n\nvar newMsg = { payload: {multiple: true , data: {20 :true, 21: \"colour\", 24: color}}};\nreturn newMsg;",
+        "func": "pm10currentNorm = msg.payload.sensors[4].data[0].current_norm;\n\n// https://pypi.org/project/tinytuya/\n// Version 3.3 - Light Type (RGB)\n// DP ID \tFunction Point \tType \tRange \tUnits\n// 24 \tColor \thexstring \th:0-360,s:0-1000,v:0-1000 \thsv \n// color is dps 24 in format \"0[hhh]0[sss]0[vvv]\" where vvv is like brightness and is in range 0-1000\n\n\nswitch (pm10currentNorm){\n    case \"grade-a\": color = \"007803E803E8\"; break;\n    case \"grade-b\": color = \"004E03E803E8\"; break;\n    case \"grade-c\": color = \"002D03E803E8\"; break;\n    case \"grade-d\": color = \"001C03E803E8\"; break;\n    case \"grade-e\": color = \"000E03E803E8\"; break;\n    case \"grade-f\": color = \"000003E803E8\"; break;\n\n}\n\n\nvar newMsg = { payload: {multiple: true , data: {20 :true, 21: \"colour\", 24: color}}};\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 720,
-        "y": 220,
+        "y": 300,
         "wires": [
             [
                 "34dbd056f5325d8f",
@@ -5003,7 +5072,7 @@
         "action": "obj",
         "pretty": false,
         "x": 520,
-        "y": 220,
+        "y": 300,
         "wires": [
             [
                 "b32fe108ce8b9f31",
@@ -5016,7 +5085,7 @@
         "type": "debug",
         "z": "03f2afeb9c6195e8",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -5024,7 +5093,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 550,
-        "y": 140,
+        "y": 220,
         "wires": []
     },
     {
@@ -5042,7 +5111,7 @@
         "tuyaVersion": "3.1",
         "eventMode": "event-both",
         "x": 930,
-        "y": 220,
+        "y": 300,
         "wires": [
             [
                 "eae9dfa5116c7649"
@@ -5065,7 +5134,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 200,
+        "y": 280,
         "wires": []
     },
     {
@@ -5081,7 +5150,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 240,
+        "y": 320,
         "wires": []
     },
     {
@@ -5092,7 +5161,7 @@
         "scope": null,
         "uncaught": false,
         "x": 610,
-        "y": 40,
+        "y": 120,
         "wires": [
             [
                 "e2437d79719fae4a"
@@ -5113,7 +5182,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 840,
-        "y": 40,
+        "y": 120,
         "wires": []
     },
     {
@@ -5135,7 +5204,7 @@
         "topic": "",
         "payloadType": "str",
         "x": 450,
-        "y": 300,
+        "y": 380,
         "wires": [
             [
                 "b32fe108ce8b9f31"
@@ -5160,7 +5229,7 @@
         "onceDelay": 0.1,
         "topic": "",
         "x": 450,
-        "y": 340,
+        "y": 420,
         "wires": [
             [
                 "b32fe108ce8b9f31"
@@ -5185,7 +5254,7 @@
         "onceDelay": 0.1,
         "topic": "",
         "x": 450,
-        "y": 380,
+        "y": 460,
         "wires": [
             [
                 "b32fe108ce8b9f31"
@@ -5210,7 +5279,7 @@
         "onceDelay": 0.1,
         "topic": "",
         "x": 450,
-        "y": 420,
+        "y": 500,
         "wires": [
             [
                 "b32fe108ce8b9f31"
@@ -5235,7 +5304,7 @@
         "onceDelay": 0.1,
         "topic": "",
         "x": 450,
-        "y": 460,
+        "y": 540,
         "wires": [
             [
                 "b32fe108ce8b9f31"
@@ -5260,7 +5329,7 @@
         "onceDelay": 0.1,
         "topic": "",
         "x": 450,
-        "y": 500,
+        "y": 580,
         "wires": [
             [
                 "b32fe108ce8b9f31"
