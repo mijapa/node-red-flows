@@ -3616,76 +3616,17 @@
                 "vt": "str"
             }
         ],
-        "repeat": "60",
+        "repeat": "900",
         "crontab": "",
         "once": true,
-        "onceDelay": "1",
+        "onceDelay": "15",
         "topic": "",
         "payloadType": "date",
-        "x": 210,
-        "y": 200,
-        "wires": [
-            [
-                "4ab5f024937c22ab"
-            ]
-        ]
-    },
-    {
-        "id": "4ab5f024937c22ab",
-        "type": "http request",
-        "z": "fba4eb03b808932c",
-        "name": "",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://api.syngeos.pl/api/public/widget.html?deviceId=1126&sensorsList[]=pm10&template=horizontal&theme=dark",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "authType": "",
-        "x": 250,
+        "x": 190,
         "y": 280,
         "wires": [
             [
-                "faab8e2e6bd88422",
-                "e9e254f0e5e91f2c"
-            ]
-        ]
-    },
-    {
-        "id": "40ee668a6dda3267",
-        "type": "debug",
-        "z": "fba4eb03b808932c",
-        "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 470,
-        "y": 360,
-        "wires": []
-    },
-    {
-        "id": "faab8e2e6bd88422",
-        "type": "function",
-        "z": "fba4eb03b808932c",
-        "name": "",
-        "func": "const regex = /\\d*\\.?\\d*(?= µg\\/m³)/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseFloat(m).toString()};\nreturn newMsg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 430,
-        "y": 400,
-        "wires": [
-            [
-                "40ee668a6dda3267",
-                "c5ab8e3d8b9177e9"
+                "f1e45b5f31c7d524"
             ]
         ]
     },
@@ -3697,47 +3638,12 @@
         "gateway": "78e0f45783bb3ba6",
         "thing": "virtual-things-custom-e98369aa-4f40-4ecd-b905-4a26a7e639ba",
         "property": "pm10density",
-        "inputMode": "injected",
-        "x": 700,
-        "y": 400,
+        "inputMode": "advanced",
+        "input": "payload.value",
+        "inputt": "msg",
+        "x": 1300,
+        "y": 280,
         "wires": []
-    },
-    {
-        "id": "332e0c5965c5e196",
-        "type": "debug",
-        "z": "fba4eb03b808932c",
-        "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 470,
-        "y": 480,
-        "wires": []
-    },
-    {
-        "id": "e9e254f0e5e91f2c",
-        "type": "function",
-        "z": "fba4eb03b808932c",
-        "name": "",
-        "func": "const regex = /(?<=<p class=\"widget-body__value\">)\\d*/gm;\nvar str = msg.payload\nvar m = regex.exec(str)\n\nvar newMsg = { payload: parseInt(m)};\nreturn newMsg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 430,
-        "y": 520,
-        "wires": [
-            [
-                "332e0c5965c5e196",
-                "e7e1f4dfe16e0c3e"
-            ]
-        ]
     },
     {
         "id": "e7e1f4dfe16e0c3e",
@@ -3747,8 +3653,10 @@
         "gateway": "78e0f45783bb3ba6",
         "thing": "virtual-things-custom-e98369aa-4f40-4ecd-b905-4a26a7e639ba",
         "property": "pm10percentage",
-        "inputMode": "injected",
-        "x": 700,
+        "inputMode": "advanced",
+        "input": "payload.pm10threshold_level",
+        "inputt": "msg",
+        "x": 1300,
         "y": 520,
         "wires": []
     },
@@ -3763,7 +3671,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 610,
+        "x": 1050,
         "y": 280,
         "wires": [
             [
@@ -3785,8 +3693,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 530,
-        "y": 160,
+        "x": 1070,
+        "y": 220,
         "wires": []
     },
     {
@@ -5335,5 +5243,96 @@
                 "b32fe108ce8b9f31"
             ]
         ]
+    },
+    {
+        "id": "f1e45b5f31c7d524",
+        "type": "http request",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.syngeos.pl/api/public/data/device/1126",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 450,
+        "y": 280,
+        "wires": [
+            [
+                "09a82c82813525d4"
+            ]
+        ]
+    },
+    {
+        "id": "5af8ae7ca14018df",
+        "type": "debug",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "717807e852872786",
+        "type": "function",
+        "z": "fba4eb03b808932c",
+        "name": "select values",
+        "func": "pm10value = msg.payload.sensors[4].data[0].value;\npm10threshold_level = msg.payload.sensors[4].data[0].threshold_level;\n\n\nvar newMsg = { payload: {pm10value: pm10value , pm10threshold_level: pm10threshold_level}};\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 280,
+        "wires": [
+            [
+                "5af8ae7ca14018df",
+                "e7e1f4dfe16e0c3e",
+                "c5ab8e3d8b9177e9"
+            ]
+        ]
+    },
+    {
+        "id": "09a82c82813525d4",
+        "type": "json",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 600,
+        "y": 280,
+        "wires": [
+            [
+                "717807e852872786",
+                "1e4be765567f3367"
+            ]
+        ]
+    },
+    {
+        "id": "1e4be765567f3367",
+        "type": "debug",
+        "z": "fba4eb03b808932c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 200,
+        "wires": []
     }
 ]
