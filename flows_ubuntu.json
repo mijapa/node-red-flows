@@ -2199,7 +2199,7 @@
         "type": "debug",
         "z": "4a573f048a4dd2d3",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -2429,16 +2429,24 @@
                 "y": 0.37
             },
             {
+                "x": 0.39,
+                "y": 0.424
+            },
+            {
+                "x": 0.5,
+                "y": 0.46
+            },
+            {
                 "x": 0.6,
-                "y": 0.58
+                "y": 0.55
             },
             {
-                "x": 0.75,
-                "y": 0.65
+                "x": 0.766,
+                "y": 0.564
             },
             {
-                "x": 1,
-                "y": 0.67
+                "x": 0.983,
+                "y": 0.597
             },
             {
                 "x": null,
@@ -2479,7 +2487,7 @@
         "type": "debug",
         "z": "4a573f048a4dd2d3",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -2496,7 +2504,7 @@
         "type": "debug",
         "z": "4a573f048a4dd2d3",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -3665,7 +3673,7 @@
         "type": "function",
         "z": "fba4eb03b808932c",
         "name": "round to 2 decimal place",
-        "func": "var number = msg.payload\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
+        "func": "var number = msg.payload.pm10value\nvar rounded = Math.round(number*100)/100\nvar newMsg = {payload: rounded}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -4413,7 +4421,7 @@
         "type": "function",
         "z": "4a573f048a4dd2d3",
         "name": "daytime multiply",
-        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*1.1}\nreturn newMsg;",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*1.2}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -4602,7 +4610,7 @@
         "type": "function",
         "z": "4a573f048a4dd2d3",
         "name": "adjust multiply",
-        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*0.85}\nreturn newMsg;",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*0.75}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -5270,7 +5278,7 @@
         "type": "debug",
         "z": "fba4eb03b808932c",
         "name": "",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -5324,7 +5332,7 @@
         "type": "debug",
         "z": "fba4eb03b808932c",
         "name": "",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
