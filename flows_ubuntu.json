@@ -2429,28 +2429,28 @@
                 "y": 0.37
             },
             {
-                "x": 0.39,
-                "y": 0.424
+                "x": 0.4,
+                "y": 0.45
             },
             {
                 "x": 0.5,
-                "y": 0.46
+                "y": 0.53
             },
             {
                 "x": 0.6,
-                "y": 0.55
+                "y": 0.61
             },
             {
-                "x": 0.766,
-                "y": 0.564
+                "x": 0.7,
+                "y": 0.65
             },
             {
-                "x": 0.983,
-                "y": 0.597
+                "x": 0.8,
+                "y": 0.68
             },
             {
-                "x": null,
-                "y": null
+                "x": 1,
+                "y": 0.7
             }
         ],
         "x": 830,
@@ -4382,17 +4382,17 @@
         "conditions": [
             {
                 "operator": "between",
-                "label": "between 04:00 and 14:00",
+                "label": "between 02:00 and 15:00",
                 "operands": [
                     {
                         "type": "time",
-                        "value": "04:00",
+                        "value": "02:00",
                         "offset": 0,
                         "random": false
                     },
                     {
                         "type": "time",
-                        "value": "14:00",
+                        "value": "15:00",
                         "offset": 0,
                         "random": false
                     }
@@ -4610,7 +4610,7 @@
         "type": "function",
         "z": "4a573f048a4dd2d3",
         "name": "adjust multiply",
-        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*0.75}\nreturn newMsg;",
+        "func": "var input = msg.payload\n\nvar newMsg = {payload: input*0.8}\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
