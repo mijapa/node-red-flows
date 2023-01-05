@@ -2145,7 +2145,8 @@
         "wires": [
             [
                 "ef30c12dcb7ca9a6",
-                "bf92692bed302d3f"
+                "bf92692bed302d3f",
+                "f81951f66bc42228"
             ]
         ]
     },
@@ -2356,7 +2357,7 @@
         "type": "debug",
         "z": "4a573f048a4dd2d3",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -2991,8 +2992,8 @@
         "y": 360,
         "wires": [
             [
-                "e46114b4a0d45d59",
-                "f304e5ccf1039231"
+                "f304e5ccf1039231",
+                "e907649c35b498f9"
             ]
         ]
     },
@@ -3028,6 +3029,179 @@
                 "52656ccb84754ed8"
             ]
         ]
+    },
+    {
+        "id": "f81951f66bc42228",
+        "type": "webthingsio-get-property",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "gateway": "78e0f45783bb3ba6",
+        "thing": "virtual-things-custom-de861e3b-bbe9-4f3a-8558-4fce0b72b82c",
+        "property": "grzejbardziej",
+        "x": 980,
+        "y": 20,
+        "wires": [
+            [
+                "560cf3f6238c5a26"
+            ]
+        ]
+    },
+    {
+        "id": "74572a19c39318da",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "8318833311ace474",
+        "type": "join",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1070,
+        "y": 140,
+        "wires": [
+            [
+                "99be73b0cb94faef",
+                "09ca92f17fa68420"
+            ]
+        ]
+    },
+    {
+        "id": "09ca92f17fa68420",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "a4639b604ae06ddb",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1310,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "99be73b0cb94faef",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "multiple jeśli grzej bardziej",
+        "func": "msg.payload.grzej_bardziej\nmsg.payload.krzywa\nvar krzywa = msg.payload.krzywa\n\nif (msg.payload.grzej_bardziej){\n    krzywa = krzywa * 1.1}\n    \nvar newMsg = {payload: krzywa}\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 140,
+        "wires": [
+            [
+                "a4639b604ae06ddb",
+                "e46114b4a0d45d59"
+            ]
+        ]
+    },
+    {
+        "id": "e907649c35b498f9",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"krzywa\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 200,
+        "wires": [
+            [
+                "74572a19c39318da",
+                "8318833311ace474"
+            ]
+        ]
+    },
+    {
+        "id": "560cf3f6238c5a26",
+        "type": "function",
+        "z": "4a573f048a4dd2d3",
+        "name": "wrap",
+        "func": "msg = {payload:msg.payload,\n    topic:\"grzej_bardziej\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 80,
+        "wires": [
+            [
+                "5c19a834d4e181d2",
+                "8318833311ace474"
+            ]
+        ]
+    },
+    {
+        "id": "5c19a834d4e181d2",
+        "type": "debug",
+        "z": "4a573f048a4dd2d3",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 120,
+        "wires": []
     },
     {
         "id": "e85bc33b2c5e6bb5",
